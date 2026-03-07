@@ -55,12 +55,12 @@ export default function ToastAlert() {
             gap: 6, padding: "8px 0",
             fontFamily: FONTS.mono,
           }}>
-            <span className="pixel-bounce" style={{ fontSize: 24 }}>🌊</span>
+            <span className="pixel-bounce" style={{ fontSize: 28 }}>🌊</span>
             <div>
-              <div style={{ fontSize: 20, color: C.dim, textShadow: `0 0 6px ${C.dim}` }}>
+              <div style={{ fontSize: 26, color: C.dim, textShadow: `0 0 6px ${C.dim}` }}>
                 No whales yet~
               </div>
-              <div style={{ fontSize: 14, color: C.dim }}>
+              <div style={{ fontSize: 18, color: C.dim }}>
                 Big bets ($3M+) show here!
               </div>
             </div>
@@ -73,28 +73,34 @@ export default function ToastAlert() {
               <div key={toast.id} className={toast.removing ? "toast-out" : "toast-in"} style={{
                 padding: "6px 8px",
                 background: "rgba(255,221,102,0.06)",
-                border: `2px solid ${C.gold}`,
-                boxShadow: `0 0 10px ${C.gold}30`,
+                border: `3px solid ${C.gold}`,
+                boxShadow: `0 0 20px ${C.gold}50, 0 0 40px ${C.gold}20`,
                 fontFamily: FONTS.mono,
                 overflow: "hidden",
               }}>
+                <div style={{
+                  fontFamily: FONTS.display, fontSize: 10, color: C.gold,
+                  textShadow: `0 0 8px ${C.gold}`, marginBottom: 2,
+                }}>
+                  <span className="pixel-bounce" style={{ fontSize: 28, verticalAlign: "middle" }}>🐋</span> WHALE INCOMING!
+                </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
                   <span style={{
-                    fontSize: 24, color: C.bright,
+                    fontSize: 30, color: C.bright,
                     textShadow: `0 0 8px ${C.bright}`,
                   }}>{toast.trade.tk}</span>
                   <span style={{
-                    fontSize: 20, color: dirColor,
+                    fontSize: 24, color: dirColor,
                     textShadow: `0 0 6px ${dirColor}`,
                   }}>
                     {dir ? "📈UP" : "📉DN"}
                   </span>
                   <span style={{
-                    fontSize: 24, color: C.gold, marginLeft: "auto",
+                    fontSize: 30, color: C.gold, marginLeft: "auto",
                     textShadow: `0 0 10px ${C.gold}`,
                   }}>{fmt(toast.trade.total)}</span>
                 </div>
-                <div style={{ fontSize: 14, color: C.dim }}>
+                <div style={{ fontSize: 18, color: C.dim }}>
                   🐋 BIG bet! ${toast.trade.strike}
                 </div>
               </div>

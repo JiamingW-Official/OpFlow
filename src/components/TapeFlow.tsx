@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useFlow } from "../context/FlowContext";
 import { C, TICKERS, FONTS } from "../constants/theme";
 import { fmt } from "../lib/format";
 import PixelCard from "./ui/PixelCard";
+import { playStreak, playCombo } from "../lib/sounds";
 import type { FilterType } from "../types";
 
 const PREMIUM_OPTIONS = [
@@ -48,6 +49,22 @@ export default function TapeFlow() {
     return { count, type: first };
   }, [filtered]);
 
+  // Sound effects for streak milestones
+  const prevStreakRef = useRef(0);
+  useEffect(() => {
+    if (streak.count >= 5 && prevStreakRef.current < 5) {
+      playCombo();
+      if (streak.count >= 10) {
+        window.dispatchEvent(new CustomEvent("flow:milestone", {
+          detail: { key: "streak-10", emoji: "🔥", text: "10x STREAK!" },
+        }));
+      }
+    } else if (streak.count >= 3 && prevStreakRef.current < 3) {
+      playStreak();
+    }
+    prevStreakRef.current = streak.count;
+  }, [streak.count]);
+
   return (
     <PixelCard title="LIVE BETS" titleIcon="🎰" style={{ display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0, minWidth: 0 }}>
       {/* Streak banner */}
@@ -57,9 +74,9 @@ export default function TapeFlow() {
           background: streak.type === "CALL" ? "rgba(0,255,136,0.06)" : "rgba(255,51,102,0.06)",
           borderBottom: `2px solid ${streak.type === "CALL" ? C.call : C.put}30`,
           display: "flex", alignItems: "center", gap: 4,
-          fontFamily: FONTS.display, fontSize: 7,
+          fontFamily: FONTS.display, fontSize: 10,
         }}>
-          <span style={{ fontSize: 14 }}>{streak.type === "CALL" ? "🔥" : "❄️"}</span>
+          <span style={{ fontSize: 18 }}>{streak.type === "CALL" ? "🔥" : "❄️"}</span>
           <span style={{ color: streak.type === "CALL" ? C.call : C.put, textShadow: `0 0 6px ${streak.type === "CALL" ? C.call : C.put}` }}>
             {streak.count}x {streak.type === "CALL" ? "UP" : "DOWN"} STREAK!
           </span>
@@ -81,7 +98,7 @@ export default function TapeFlow() {
           const label = f === "ALL" ? "ALL" : f === "CALL" ? "UP" : "DN";
           return (
             <button key={f} onClick={() => setType(f)} style={{
-              padding: "2px 4px", fontSize: 18,
+              padding: "2px 4px", fontSize: 22,
               border: `2px solid ${active ? color : "transparent"}`,
               background: active ? `${color}15` : "transparent",
               color: active ? color : C.dim,
@@ -92,7 +109,7 @@ export default function TapeFlow() {
         })}
         <div style={{ flex: 1 }} />
         <button onClick={() => setShowFilters(p => !p)} style={{
-          padding: "2px 4px", fontSize: 16,
+          padding: "2px 4px", fontSize: 20,
           border: `2px solid ${activeFilterCount > 0 ? C.accent : "transparent"}`,
           background: activeFilterCount > 0 ? "rgba(102,204,255,0.08)" : "transparent",
           color: activeFilterCount > 0 ? C.accent : C.dim,
@@ -106,13 +123,13 @@ export default function TapeFlow() {
       {showFilters && (
         <div style={{ padding: "4px 6px", borderBottom: `3px solid rgba(102,204,255,0.08)`, display: "flex", flexDirection: "column", gap: 3, overflow: "hidden" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 14 }}>💎</span>
+            <span style={{ fontSize: 18 }}>💎</span>
             {PREMIUM_OPTIONS.map(o => (
               <PxBtn key={o.value} active={filters.minPremium === o.value} onClick={() => setFilters(p => ({ ...p, minPremium: o.value }))}>{o.label}</PxBtn>
             ))}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 14 }}>📅</span>
+            <span style={{ fontSize: 18 }}>📅</span>
             {EXPIRY_OPTIONS.map(o => (
               <PxBtn key={o.value} active={filters.expiry === o.value} onClick={() => setFilters(p => ({ ...p, expiry: o.value }))}>{o.label}</PxBtn>
             ))}
@@ -141,11 +158,11 @@ export default function TapeFlow() {
             const size = sizeLabel(t.total);
             const relSize = t.total / maxPrem;
             return (
-              <div key={t.id} className={i === 0 ? "new-trade" : ""} style={{
+              <div key={t.id} className={`trade-row ${i === 0 ? "new-trade" : ""}`} style={{
                 padding: "5px 6px",
-                background: i % 2 === 0 ? "rgba(102,204,255,0.02)" : "transparent",
-                borderBottom: "1px solid rgba(102,204,255,0.04)",
-                borderLeft: size.text ? `3px solid ${size.color}` : "3px solid transparent",
+                background: dir ? "rgba(0,255,136,0.03)" : "rgba(255,51,102,0.03)",
+                borderBottom: `1px solid ${dirColor}10`,
+                borderLeft: size.text ? `3px solid ${size.color}` : `3px solid ${dirColor}30`,
                 position: "relative", overflow: "hidden",
               }}>
                 {/* Background size bar */}
@@ -157,12 +174,12 @@ export default function TapeFlow() {
                 }} />
                 <div style={{ display: "flex", alignItems: "center", gap: 3, overflow: "hidden", position: "relative" }}>
                   <span style={{
-                    fontSize: 24, color: C.bright,
+                    fontSize: 30, color: C.bright,
                     textShadow: `0 0 6px ${C.bright}`,
                     flexShrink: 0,
                   }}>{t.tk}</span>
                   <span style={{
-                    color: dirColor, fontSize: 20,
+                    color: dirColor, fontSize: 24,
                     textShadow: `0 0 6px ${dirColor}`,
                     flexShrink: 0,
                   }}>
@@ -170,17 +187,17 @@ export default function TapeFlow() {
                   </span>
                   {size.text && (
                     <span className="pixel-glow-pulse" style={{
-                      fontFamily: FONTS.display, fontSize: 7,
+                      fontFamily: FONTS.display, fontSize: 10,
                       color: size.color, flexShrink: 0,
                     }}>{size.text}</span>
                   )}
                   <span style={{
-                    marginLeft: "auto", color: C.gold, fontSize: 22,
+                    marginLeft: "auto", color: C.gold, fontSize: 28,
                     textShadow: `0 0 8px ${C.gold}`,
                     flexShrink: 0,
                   }}>{fmt(t.total)}</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 14, color: C.dim, marginTop: 1, overflow: "hidden", position: "relative" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 18, color: C.dim, marginTop: 1, overflow: "hidden", position: "relative" }}>
                   <span>${t.strike}</span>
                   <span>{t.exp}</span>
                   <span>{t.vol.toLocaleString()}</span>
@@ -199,7 +216,7 @@ export default function TapeFlow() {
 function PxBtn({ children, active, onClick }: { children: string; active: boolean; onClick: () => void }) {
   return (
     <button onClick={onClick} style={{
-      padding: "1px 4px", fontSize: 14,
+      padding: "1px 4px", fontSize: 18,
       border: `2px solid ${active ? C.accent : "rgba(102,204,255,0.12)"}`,
       background: active ? "rgba(102,204,255,0.1)" : "transparent",
       color: active ? C.accent : C.dim,

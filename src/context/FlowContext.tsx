@@ -37,12 +37,16 @@ export function FlowProvider({ children }: { children: ReactNode }) {
   const vizCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const derived = useMemo(() => {
-    const recent = trades.slice(0, 30);
-    const totalPrem = recent.reduce((s, t) => s + t.total, 0);
-    const callRatio = recent.length > 0 ? recent.filter(t => t.type === "CALL").length / recent.length : 0.5;
-    const blocks = recent.filter(t => t.isBlock).length;
-    const sweeps = recent.filter(t => t.isSweep).length;
-    return { totalPrem, callRatio, blocks, sweeps };
+    const len = Math.min(trades.length, 30);
+    let totalPrem = 0, calls = 0, blocks = 0, sweeps = 0;
+    for (let i = 0; i < len; i++) {
+      const t = trades[i];
+      totalPrem += t.total;
+      if (t.type === "CALL") calls++;
+      if (t.isBlock) blocks++;
+      if (t.isSweep) sweeps++;
+    }
+    return { totalPrem, callRatio: len > 0 ? calls / len : 0.5, blocks, sweeps };
   }, [trades]);
 
   const filtered = useMemo(() => {

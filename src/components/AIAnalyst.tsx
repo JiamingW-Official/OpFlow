@@ -3,6 +3,7 @@ import { useFlow } from "../context/FlowContext";
 import { C, FONTS } from "../constants/theme";
 import { askNeko } from "../lib/neko-brain";
 import PixelCard from "./ui/PixelCard";
+import { playClick } from "../lib/sounds";
 import type { Message } from "../types";
 
 export default function AIAnalyst() {
@@ -43,6 +44,7 @@ export default function AIAnalyst() {
 
   const askAI = useCallback(() => {
     if (!inp.trim() || aiLoad) return;
+    playClick();
     const q = inp.trim();
     setInp("");
     setMsgs(p => [...p, { r: "user", t: q }]);
@@ -77,6 +79,7 @@ export default function AIAnalyst() {
 
   const sendQuick = useCallback((q: string) => {
     if (aiLoad) return;
+    playClick();
     setInp("");
     setMsgs(p => [...p, { r: "user", t: q }]);
     setAiLoad(true);
@@ -102,13 +105,13 @@ export default function AIAnalyst() {
             whiteSpace: "pre-line",
           }}>
             <div style={{
-              fontSize: 14, marginBottom: 2,
+              fontSize: 18, marginBottom: 2,
               color: m.r === "ai" ? C.violet : C.dim,
               textShadow: m.r === "ai" ? `0 0 6px ${C.violet}` : "none",
             }}>
               {m.r === "ai" ? "🐱 Neko" : "🧑 You"}
             </div>
-            <div style={{ fontSize: 20, lineHeight: 1.4, color: C.text }}>{m.t}</div>
+            <div style={{ fontSize: 26, lineHeight: 1.4, color: C.text }}>{m.t}</div>
           </div>
         ))}
         {aiLoad && typingText && (
@@ -118,8 +121,8 @@ export default function AIAnalyst() {
             border: "2px solid rgba(204,136,255,0.25)",
             whiteSpace: "pre-line",
           }}>
-            <div style={{ fontSize: 14, color: C.violet, textShadow: `0 0 6px ${C.violet}` }}>🐱 Neko</div>
-            <div style={{ fontSize: 20, lineHeight: 1.4, color: C.text }}>
+            <div style={{ fontSize: 18, color: C.violet, textShadow: `0 0 6px ${C.violet}` }}>🐱 Neko</div>
+            <div style={{ fontSize: 26, lineHeight: 1.4, color: C.text }}>
               <span>{typingText}</span>
               <span className="type-cursor" />
             </div>
@@ -131,8 +134,8 @@ export default function AIAnalyst() {
             background: "linear-gradient(135deg, rgba(204,136,255,0.1), rgba(255,136,187,0.06))",
             border: "2px solid rgba(204,136,255,0.25)",
           }}>
-            <div style={{ fontSize: 14, color: C.violet, textShadow: `0 0 6px ${C.violet}` }}>🐱 Neko</div>
-            <span className="pixel-glow-pulse" style={{ fontSize: 20, color: C.violet }}>
+            <div style={{ fontSize: 18, color: C.violet, textShadow: `0 0 6px ${C.violet}` }}>🐱 Neko</div>
+            <span className="pixel-glow-pulse" style={{ fontSize: 26, color: C.violet }}>
               thinking<span className="pixel-blink">...</span>
             </span>
           </div>
@@ -143,7 +146,7 @@ export default function AIAnalyst() {
       <div style={{ padding: "3px 6px", display: "flex", flexWrap: "wrap", gap: 2 }}>
         {quickPrompts.map(p => (
           <button key={p.q} onClick={() => sendQuick(p.q)} style={{
-            fontSize: 16, padding: "2px 5px",
+            fontSize: 22, padding: "2px 5px",
             background: "transparent",
             border: "2px solid rgba(204,136,255,0.12)",
             color: C.dim,
@@ -154,7 +157,7 @@ export default function AIAnalyst() {
             onMouseLeave={e => { (e.target as HTMLElement).style.borderColor = "rgba(204,136,255,0.12)"; (e.target as HTMLElement).style.color = C.dim; }}>
             {p.q}
             <span style={{
-              fontSize: 9, fontFamily: FONTS.display, color: C.dim, opacity: 0.4,
+              fontSize: 12, fontFamily: FONTS.display, color: C.dim, opacity: 0.4,
               marginLeft: 3, verticalAlign: "super",
             }}>{p.key}</span>
           </button>
@@ -167,7 +170,7 @@ export default function AIAnalyst() {
           style={{
             flex: 1, background: "rgba(204,136,255,0.04)",
             border: "2px solid rgba(204,136,255,0.15)",
-            padding: "4px 8px", color: C.text, fontSize: 20,
+            padding: "4px 8px", color: C.text, fontSize: 26,
             outline: "none", fontFamily: FONTS.mono,
             minWidth: 0,
           }}
@@ -180,7 +183,7 @@ export default function AIAnalyst() {
         <button onClick={askAI} style={{
           padding: "4px 8px", background: "transparent",
           border: `2px solid ${C.violet}`,
-          color: C.violet, fontSize: 20, cursor: "pointer",
+          color: C.violet, fontSize: 26, cursor: "pointer",
           fontFamily: FONTS.mono,
           textShadow: `0 0 6px ${C.violet}`,
           flexShrink: 0,

@@ -1,9 +1,16 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useFlow } from "../context/FlowContext";
 import { C, FONTS } from "../constants/theme";
 import { fmt } from "../lib/format";
 import PixelCard from "./ui/PixelCard";
 import ExportButton from "./ExportButton";
+import { playLevelUp, playMeow, playClick, isMuted, toggleMute } from "../lib/sounds";
+
+const CAT_REACTIONS = [
+  "nya~!", "meow!", "*purr*", "(=^-ω-^=)", "buy calls!", "sell puts!",
+  "moon soon!", "diamond paws!", "HODL!", "gm gm~", "wen lambo?",
+  "*nuzzle*", "to the moon!", "bullish!", "let's go!",
+];
 
 // Power level based on total premium
 function getPowerLevel(prem: number) {
@@ -20,12 +27,42 @@ export default function Header() {
   const statusColor = connectionStatus === "connected" ? C.call
     : connectionStatus === "connecting" ? C.gold : C.put;
 
+  const [catClicks, setCatClicks] = useState(0);
+  const [catMsg, setCatMsg] = useState("");
+  const [muted, setMutedState] = useState(() => isMuted());
+
+  const onCatClick = useCallback(() => {
+    setCatClicks(c => c + 1);
+    setCatMsg(CAT_REACTIONS[Math.floor(Math.random() * CAT_REACTIONS.length)]);
+    playMeow();
+    setTimeout(() => setCatMsg(""), 1200);
+  }, []);
+
+  const onToggleMute = useCallback(() => {
+    setMutedState(toggleMute());
+  }, []);
+
   const power = getPowerLevel(totalPrem);
+  const prevLevelRef = useRef(power.level);
+  useEffect(() => {
+    if (power.level > prevLevelRef.current) {
+      playLevelUp();
+      if (power.level === 5) {
+        window.dispatchEvent(new CustomEvent("flow:milestone", {
+          detail: { key: "legendary", emoji: "🌟", text: "LEGENDARY POWER!" },
+        }));
+      }
+    }
+    prevLevelRef.current = power.level;
+  }, [power.level]);
+
   const moodEmoji = callRatio > 0.65 ? "🥳" : callRatio > 0.55 ? "😆" : callRatio > 0.45 ? "😊" : callRatio > 0.35 ? "😐" : "😱";
   const moodText = callRatio > 0.65 ? "PARTY!" : callRatio > 0.55 ? "HYPED" : callRatio > 0.45 ? "CHILL" : callRatio > 0.35 ? "MEH" : "PANIC";
   const moodColor = callRatio > 0.5 ? C.call : C.put;
+  const isActive = trades.length > 10;
 
   const handleShare = useCallback(() => {
+    playClick();
     const p = getPowerLevel(totalPrem);
     const text = `🐱 FLOW ARCADE ${p.emoji}\n\n${p.emoji} Power: ${p.name}\n💰 ${fmt(totalPrem)} flowing\n${moodEmoji} Mood: ${moodText}\n🐋 ${blocks} whales | ⚡ ${sweeps} rushes\n📊 ${trades.length} bets tracked\n\n#FlowArcade #Stocks`;
     if (navigator.share) {
@@ -37,18 +74,38 @@ export default function Header() {
 
   return (
     <PixelCard style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 12px", flexWrap: "wrap", overflow: "hidden" }}>
-      {/* Mascot */}
-      <span className="pixel-bounce" style={{ fontSize: 28, flexShrink: 0 }}>🐱</span>
+      {/* Mascot — click easter egg */}
+      <span onClick={onCatClick} className="pixel-bounce" style={{
+        fontSize: 34, flexShrink: 0, position: "relative",
+        transition: "transform 0.1s steps(2)",
+        transform: catMsg ? "scale(1.3) rotate(-10deg)" : undefined,
+      }}>
+        🐱
+        {catMsg && (
+          <span className="msg-in" style={{
+            position: "absolute", bottom: "110%", left: "50%", transform: "translateX(-50%)",
+            fontSize: 14, fontFamily: FONTS.display, color: C.pink,
+            textShadow: `0 0 8px ${C.pink}`,
+            whiteSpace: "nowrap", pointerEvents: "none",
+          }}>{catMsg}</span>
+        )}
+        {catClicks >= 10 && (
+          <span style={{
+            position: "absolute", top: -2, right: -4,
+            fontSize: 10, fontFamily: FONTS.display, color: C.gold,
+          }}>✦</span>
+        )}
+      </span>
       <div style={{ flexShrink: 0 }}>
         <div style={{
-          fontFamily: FONTS.display, fontSize: 11, color: C.pink,
+          fontFamily: FONTS.display, fontSize: 14, color: C.pink,
           textShadow: `0 0 12px ${C.pink}`,
         }}>
           FLOW<span style={{ color: C.gold }}>✦</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 1 }}>
-          <span className="pixel-blink" style={{ color: statusColor, fontSize: 8 }}>●</span>
-          <span style={{ fontSize: 16, color: statusColor, textShadow: `0 0 6px ${statusColor}` }}>
+          <span className="pixel-blink" style={{ color: statusColor, fontSize: 10 }}>●</span>
+          <span style={{ fontSize: 20, color: statusColor, textShadow: `0 0 6px ${statusColor}` }}>
             {connectionStatus === "connected" ? "LIVE" : "..."}
           </span>
         </div>
@@ -62,16 +119,15 @@ export default function Header() {
         display: "flex", alignItems: "center", gap: 4, flexShrink: 0,
         position: "relative", overflow: "hidden",
       }}>
-        {/* Background fill bar showing progress to next level */}
         <div style={{
           position: "absolute", left: 0, top: 0, bottom: 0,
           width: `${Math.min((totalPrem / (power.level === 5 ? 50e6 : power.level === 4 ? 50e6 : power.level === 3 ? 20e6 : power.level === 2 ? 10e6 : 5e6)) * 100, 100)}%`,
           background: `${power.color}15`,
           transition: "width 0.5s steps(8)",
         }} />
-        <span style={{ fontSize: 16, position: "relative" }}>{power.emoji}</span>
+        <span style={{ fontSize: 20, position: "relative" }}>{power.emoji}</span>
         <span style={{
-          fontFamily: FONTS.display, fontSize: 7, color: power.color,
+          fontFamily: FONTS.display, fontSize: 10, color: power.color,
           textShadow: `0 0 8px ${power.color}`,
           position: "relative",
         }}>LV{power.level} {power.name}</span>
@@ -79,7 +135,7 @@ export default function Header() {
 
       {/* Trade counter */}
       <div style={{
-        fontFamily: FONTS.display, fontSize: 7, color: C.dim,
+        fontFamily: FONTS.display, fontSize: 10, color: C.dim,
         flexShrink: 0, display: "flex", alignItems: "center", gap: 3,
       }}>
         <span style={{ color: C.accent, textShadow: `0 0 4px ${C.accent}` }}>
@@ -91,17 +147,28 @@ export default function Header() {
       <div style={{ flex: 1, minWidth: 8 }} />
 
       {/* Stats */}
-      <Stat emoji="💰" val={fmt(totalPrem)} color={C.accent} label="FLOW" />
-      <Stat emoji={moodEmoji} val={moodText} color={moodColor} label="MOOD" />
-      <Stat emoji="🐋" val={String(blocks)} color={C.gold} label="WHALE" />
-      <Stat emoji="⚡" val={String(sweeps)} color={C.violet} label="RUSH" />
+      <Stat emoji="💰" val={fmt(totalPrem)} color={C.accent} label="FLOW" active={isActive} />
+      <Stat emoji={moodEmoji} val={moodText} color={moodColor} label="MOOD" active={isActive} />
+      <Stat emoji="🐋" val={String(blocks)} color={C.gold} label="WHALE" active={isActive} />
+      <Stat emoji="⚡" val={String(sweeps)} color={C.violet} label="RUSH" active={isActive} />
 
       <div style={{ width: 2, height: 24, background: "rgba(102,204,255,0.1)", flexShrink: 0 }} />
+
+      {/* Mute toggle */}
+      <button onClick={onToggleMute} style={{
+        padding: "4px 8px", fontSize: 24,
+        background: "transparent",
+        border: `2px solid ${muted ? C.dim : C.accent}`,
+        color: muted ? C.dim : C.accent,
+        cursor: "pointer", fontFamily: FONTS.mono,
+        textShadow: muted ? "none" : `0 0 6px ${C.accent}`,
+        flexShrink: 0,
+      }}>{muted ? "🔇" : "🔊"}</button>
 
       <ExportButton />
 
       <button onClick={handleShare} style={{
-        padding: "4px 8px", fontSize: 20,
+        padding: "4px 8px", fontSize: 24,
         background: "transparent",
         border: `2px solid ${C.pink}`,
         color: C.pink, cursor: "pointer",
@@ -117,14 +184,14 @@ export default function Header() {
   );
 }
 
-function Stat({ emoji, val, color, label }: { emoji: string; val: string; color: string; label?: string }) {
+function Stat({ emoji, val, color, label, active }: { emoji: string; val: string; color: string; label?: string; active?: boolean }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
-      <span style={{ fontSize: 18 }}>{emoji}</span>
+      <span style={{ fontSize: 22 }}>{emoji}</span>
       <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
-        {label && <span style={{ fontSize: 8, fontFamily: FONTS.display, color: C.dim, letterSpacing: 1 }}>{label}</span>}
-        <span style={{
-          fontSize: 24, color, lineHeight: 1,
+        {label && <span style={{ fontSize: 10, fontFamily: FONTS.display, color: C.dim, letterSpacing: 1 }}>{label}</span>}
+        <span className={active ? "neon-pulse-active" : ""} style={{
+          fontSize: 30, color, lineHeight: 1,
           textShadow: `0 0 8px ${color}, 0 0 2px ${color}`,
         }}>{val}</span>
       </div>

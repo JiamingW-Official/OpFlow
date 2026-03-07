@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useFlow } from "../context/FlowContext";
 import { C } from "../constants/theme";
 import PixelCard from "./ui/PixelCard";
@@ -25,7 +25,7 @@ export default function PremiumTimeline() {
     if (historyRef.current.length > 60) historyRef.current.shift();
   }, [trades]);
 
-  const drawChart = () => {
+  const drawChart = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -123,7 +123,7 @@ export default function PremiumTimeline() {
         // Value label at endpoint
         const val = getter(last);
         if (val > 0) {
-          ctx.font = "14px 'VT323', monospace";
+          ctx.font = "18px 'VT323', monospace";
           ctx.fillStyle = color;
           ctx.textAlign = "left";
           ctx.fillText(val >= 1e6 ? `${(val/1e6).toFixed(1)}M` : `${(val/1e3).toFixed(0)}K`, x + 5, y + 4);
@@ -134,22 +134,22 @@ export default function PremiumTimeline() {
     // Legend — pixel squares with LED glow
     ctx.fillStyle = C.call;
     ctx.fillRect(W - 150, 6, 10, 10);
-    ctx.font = "18px 'VT323', monospace";
+    ctx.font = "22px 'VT323', monospace";
     ctx.fillStyle = C.call;
     ctx.textAlign = "left";
     ctx.shadowColor = C.call;
     ctx.shadowBlur = 6;
-    ctx.fillText("📈 Going UP", W - 136, 16);
+    ctx.fillText("📈 Going UP", W - 150, 18);
 
     ctx.fillStyle = C.put;
     ctx.shadowColor = C.put;
-    ctx.fillRect(W - 56, 6, 10, 10);
+    ctx.fillRect(W - 60, 6, 10, 10);
     ctx.fillStyle = C.put;
-    ctx.fillText("📉 DOWN", W - 42, 16);
+    ctx.fillText("📉 DOWN", W - 46, 18);
     ctx.shadowBlur = 0;
-  };
+  }, []);
 
-  useEffect(() => { drawChart(); }, [trades]);
+  useEffect(() => { drawChart(); }, [trades, drawChart]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -157,7 +157,7 @@ export default function PremiumTimeline() {
     const ro = new ResizeObserver(() => drawChart());
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [drawChart]);
 
   return (
     <PixelCard ref={containerRef} title="UP vs DOWN" titleIcon="⚡" style={{ position: "relative", overflow: "hidden" }}>

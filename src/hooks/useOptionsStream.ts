@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { Trade, ConnectionStatus } from "../types";
 import { gen } from "../lib/format";
+import { playTrade } from "../lib/sounds";
 
 interface UseOptionsStreamOptions {
   setTrades: React.Dispatch<React.SetStateAction<Trade[]>>;
@@ -49,6 +50,10 @@ export function useOptionsStream({ setTrades, setConnectionStatus, onNewTrade }:
             };
             setTrades(prev => [trade, ...prev.slice(0, 59)]);
             onNewTradeRef.current?.(trade);
+            playTrade(trade.type === "CALL");
+            window.dispatchEvent(new CustomEvent("flow:particle-burst", {
+              detail: { x: Math.random() * window.innerWidth * 0.6 + window.innerWidth * 0.05, y: Math.random() * window.innerHeight * 0.5 + 80, color: trade.type === "CALL" ? "#00ff88" : "#ff3366" },
+            }));
           }
         }
       };
@@ -75,7 +80,11 @@ export function useOptionsStream({ setTrades, setConnectionStatus, onNewTrade }:
         const trade = gen();
         setTrades(prev => [trade, ...prev.slice(0, 59)]);
         onNewTradeRef.current?.(trade);
-      }, 1100 + Math.random() * 900);
+        playTrade(trade.type === "CALL");
+        window.dispatchEvent(new CustomEvent("flow:particle-burst", {
+          detail: { x: Math.random() * window.innerWidth * 0.6 + window.innerWidth * 0.05, y: Math.random() * window.innerHeight * 0.5 + 80, color: trade.type === "CALL" ? "#00ff88" : "#ff3366" },
+        }));
+      }, 2500 + Math.random() * 2500);
       return () => clearInterval(id);
     }
   }, [setTrades, setConnectionStatus]);

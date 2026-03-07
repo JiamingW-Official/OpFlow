@@ -12,16 +12,17 @@ export function gen(): Trade {
   const type = Math.random() > 0.47 ? "CALL" : "PUT";
   const bp = BASE[tk];
   const strike = Math.round(bp * (0.86 + Math.random() * 0.28) / 5) * 5;
-  const vol = ~~(Math.random() * 9500) + 80;
-  const prem = +(Math.random() * 52 + 0.4).toFixed(2);
+  // Skewed distribution — most trades small, occasional large ones
+  const vol = ~~(Math.random() ** 2 * 4000) + 30;
+  const prem = +(Math.random() ** 2 * 28 + 0.2).toFixed(2);
   const total = vol * prem * 100;
   const exp = EXPIRIES[~~(Math.random() * EXPIRIES.length)];
   return {
     id: uid++,
     tk, type, strike, vol, prem, total, exp,
     moneyness: strike / bp,
-    isBlock: total > 1.8e6,
-    isSweep: vol > 5200,
+    isBlock: total > 5e6,
+    isSweep: vol > 2500,
     time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
   };
 }

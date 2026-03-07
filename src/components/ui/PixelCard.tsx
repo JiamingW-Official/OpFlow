@@ -34,7 +34,7 @@ const TITLE_BAR: CSSProperties = {
   background: "linear-gradient(90deg, rgba(255,136,187,0.1), rgba(102,204,255,0.1), rgba(204,136,255,0.08))",
   borderBottom: "3px solid rgba(102,204,255,0.25)",
   fontFamily: "'Press Start 2P', monospace",
-  fontSize: 9,
+  fontSize: 12,
   letterSpacing: 1,
 };
 
@@ -55,12 +55,12 @@ const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(
       <div style={{ ...CORNER, bottom: 8, right: 8 }} />
       {title && (
         <div style={{ ...TITLE_BAR, color: titleColor || "#66ccff", textShadow: `0 0 8px ${titleColor || "#66ccff"}` }}>
-          {titleIcon && <span style={{ fontSize: 14 }}>{titleIcon}</span>}
+          {titleIcon && <span style={{ fontSize: 18 }}>{titleIcon}</span>}
           <span className="glitch-text">{title}</span>
           <span style={{ marginLeft: "auto", display: "flex", gap: 3, alignItems: "center" }}>
-            <span className="pixel-sparkle" style={{ fontSize: 10, color: "#ff88bb", animationDelay: "0s" }}>~</span>
-            <span className="pixel-sparkle" style={{ fontSize: 10, color: "#ffdd66", animationDelay: "0.4s" }}>*</span>
-            <span className="pixel-sparkle" style={{ fontSize: 10, color: "#66ccff", animationDelay: "0.8s" }}>~</span>
+            <span className="pixel-sparkle" style={{ fontSize: 13, color: "#ff88bb", animationDelay: "0s" }}>~</span>
+            <span className="pixel-sparkle" style={{ fontSize: 13, color: "#ffdd66", animationDelay: "0.4s" }}>*</span>
+            <span className="pixel-sparkle" style={{ fontSize: 13, color: "#66ccff", animationDelay: "0.8s" }}>~</span>
           </span>
         </div>
       )}

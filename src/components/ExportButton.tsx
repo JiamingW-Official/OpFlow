@@ -35,7 +35,7 @@ export default function ExportButton() {
 
   return (
     <button onClick={handleExport} style={{
-      padding: "5px 10px", fontSize: 22,
+      padding: "5px 10px", fontSize: 26,
       background: "transparent",
       border: `2px solid ${C.accent}`,
       color: C.accent, cursor: "pointer",

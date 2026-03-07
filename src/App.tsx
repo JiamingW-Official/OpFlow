@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { FlowProvider, useFlow } from "./context/FlowContext";
 import { useOptionsStream } from "./hooks/useOptionsStream";
 import Header from "./components/Header";
@@ -9,56 +9,97 @@ import AIAnalyst from "./components/AIAnalyst";
 import TickerHeat from "./components/TickerHeat";
 import ToastAlert from "./components/ToastAlert";
 import CursorTrail from "./components/ui/CursorTrail";
+import MilestonePopup from "./components/MilestonePopup";
 import { C, FONTS } from "./constants/theme";
+import { playWhale } from "./lib/sounds";
 import type { Trade } from "./types";
+
+// Isolated footer — clock updates here don't re-render the main grid
+function StatusBar() {
+  const { trades } = useFlow();
+  const [clock, setClock] = useState("");
+
+  useEffect(() => {
+    const tick = () => setClock(new Date().toLocaleTimeString("en-US", { hour12: false }));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div style={{
+      position: "fixed", bottom: 0, left: 0, right: 0, height: 16,
+      background: "linear-gradient(90deg, rgba(102,204,255,0.04), rgba(204,136,255,0.04), rgba(255,136,187,0.04))",
+      borderTop: "1px solid rgba(102,204,255,0.08)",
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      padding: "0 8px",
+      fontFamily: FONTS.display, fontSize: 8, color: C.dim,
+      pointerEvents: "none", zIndex: 101,
+      letterSpacing: 1,
+    }}>
+      <span>FLOW ARCADE v2.0</span>
+      <span style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <span>{trades.length} TRADES</span>
+        <span style={{ color: C.accent }}>{clock}</span>
+      </span>
+    </div>
+  );
+}
+
+// Static decorations — never re-render
+const HUD_STYLE = { fontSize: 10, fontFamily: FONTS.display, color: "rgba(102,204,255,0.12)", pointerEvents: "none" as const, zIndex: 100 };
+
+const CornerHUD = memo(function CornerHUD() {
+  return (
+    <>
+      <div style={{ position: "fixed", top: 4, left: 4, ...HUD_STYLE }}>┌──</div>
+      <div style={{ position: "fixed", top: 4, right: 4, ...HUD_STYLE }}>──┐</div>
+      <div style={{ position: "fixed", bottom: 18, left: 4, ...HUD_STYLE }}>└──</div>
+      <div style={{ position: "fixed", bottom: 18, right: 4, ...HUD_STYLE, textAlign: "right" }}>──┘</div>
+    </>
+  );
+});
 
 function FlowTerminal() {
   const { setTrades, setConnectionStatus, trades } = useFlow();
   const [edgeFlash, setEdgeFlash] = useState(false);
-  const [clock, setClock] = useState("");
+  const [shaking, setShaking] = useState(false);
   const prevCount = useRef(0);
-  const fps = useRef(0);
-  const frameCount = useRef(0);
-  const lastFpsTime = useRef(Date.now());
+  const whaleCount = useRef(0);
 
   const onNewTrade = useCallback((trade: Trade) => {
-    if (trade.total > 3e6) {
+    if (trade.total > 10e6) {
       window.dispatchEvent(new CustomEvent("flow:megablock", { detail: trade }));
+      playWhale();
+      setShaking(true);
+      setTimeout(() => setShaking(false), 400);
+      whaleCount.current++;
+      if (whaleCount.current === 1) {
+        window.dispatchEvent(new CustomEvent("flow:milestone", {
+          detail: { key: "first-whale", emoji: "\uD83D\uDC33", text: "FIRST WHALE SPOTTED!" },
+        }));
+      }
     }
   }, []);
 
-  // Screen edge flash on new trade
+  // Screen edge flash only on large trades ($2M+)
   useEffect(() => {
     if (trades.length > prevCount.current && prevCount.current > 0) {
-      setEdgeFlash(true);
-      const t = setTimeout(() => setEdgeFlash(false), 500);
-      return () => clearTimeout(t);
+      const latest = trades[0];
+      if (latest && latest.total > 2e6) {
+        setEdgeFlash(true);
+        const t = setTimeout(() => setEdgeFlash(false), 500);
+        prevCount.current = trades.length;
+        return () => clearTimeout(t);
+      }
     }
     prevCount.current = trades.length;
-  }, [trades.length]);
-
-  // Clock + FPS counter
-  useEffect(() => {
-    const tick = () => {
-      const now = new Date();
-      setClock(now.toLocaleTimeString("en-US", { hour12: false }));
-      frameCount.current++;
-      const elapsed = Date.now() - lastFpsTime.current;
-      if (elapsed >= 1000) {
-        fps.current = Math.round(frameCount.current * 1000 / elapsed);
-        frameCount.current = 0;
-        lastFpsTime.current = Date.now();
-      }
-    };
-    const id = setInterval(tick, 250);
-    tick();
-    return () => clearInterval(id);
-  }, []);
+  }, [trades]);
 
   useOptionsStream({ setTrades, setConnectionStatus, onNewTrade });
 
   return (
-    <div style={{
+    <div className={shaking ? "whale-shake" : ""} style={{
       position: "relative", width: "100vw", height: "100vh", overflow: "hidden",
       fontFamily: "'VT323', monospace", color: "#eeeeff",
       background: "#0f0e17",
@@ -117,23 +158,7 @@ function FlowTerminal() {
         </div>
       </div>
 
-      {/* Footer status bar */}
-      <div style={{
-        position: "fixed", bottom: 0, left: 0, right: 0, height: 16,
-        background: "linear-gradient(90deg, rgba(102,204,255,0.04), rgba(204,136,255,0.04), rgba(255,136,187,0.04))",
-        borderTop: "1px solid rgba(102,204,255,0.08)",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "0 8px",
-        fontFamily: FONTS.display, fontSize: 6, color: C.dim,
-        pointerEvents: "none", zIndex: 101,
-        letterSpacing: 1,
-      }}>
-        <span>FLOW ARCADE v2.0</span>
-        <span style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <span>{trades.length} TRADES</span>
-          <span style={{ color: C.accent }}>{clock}</span>
-        </span>
-      </div>
+      <StatusBar />
 
       {/* Screen edge flash on new trade */}
       {edgeFlash && (
@@ -143,24 +168,9 @@ function FlowTerminal() {
         }} />
       )}
 
-      {/* Corner HUD decorations */}
-      <div style={{ position: "fixed", top: 4, left: 4, fontSize: 8, fontFamily: FONTS.display, color: "rgba(102,204,255,0.12)", pointerEvents: "none", zIndex: 100 }}>
-        ┌──
-      </div>
-      <div style={{ position: "fixed", top: 4, right: 4, fontSize: 8, fontFamily: FONTS.display, color: "rgba(102,204,255,0.12)", pointerEvents: "none", zIndex: 100 }}>
-        ──┐
-      </div>
-      <div style={{ position: "fixed", bottom: 18, left: 4, fontSize: 8, fontFamily: FONTS.display, color: "rgba(102,204,255,0.12)", pointerEvents: "none", zIndex: 100 }}>
-        └──
-      </div>
-      <div style={{ position: "fixed", bottom: 18, right: 4, fontSize: 8, fontFamily: FONTS.display, color: "rgba(102,204,255,0.12)", pointerEvents: "none", zIndex: 100, textAlign: "right" }}>
-        ──┘
-      </div>
-
-      {/* Cursor trail particles */}
+      <CornerHUD />
+      <MilestonePopup />
       <CursorTrail />
-
-      {/* CRT scanline + vignette overlay */}
       <div className="crt-overlay" />
     </div>
   );

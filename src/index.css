@@ -331,6 +331,32 @@ button:active {
   animation: fadeOut 0.3s steps(4) forwards;
 }
 
+/* ═══ WHALE SHAKE — stronger ═══ */
+@keyframes whaleShake {
+  0%, 100% { transform: translate(0); }
+  10% { transform: translate(-4px, -3px); }
+  20% { transform: translate(3px, 4px); }
+  30% { transform: translate(-3px, 2px); }
+  40% { transform: translate(4px, -2px); }
+  50% { transform: translate(-2px, 3px); }
+  60% { transform: translate(3px, -1px); }
+  70% { transform: translate(-1px, 2px); }
+}
+
+.whale-shake {
+  animation: whaleShake 0.4s steps(2) forwards;
+}
+
+/* ═══ NEON PULSE ACTIVE ═══ */
+@keyframes neonPulseStrong {
+  0%, 100% { text-shadow: 0 0 8px currentColor, 0 0 2px currentColor; }
+  50% { text-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 6px currentColor; }
+}
+
+.neon-pulse-active {
+  animation: neonPulseStrong 1s steps(3) infinite;
+}
+
 /* Pixel scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

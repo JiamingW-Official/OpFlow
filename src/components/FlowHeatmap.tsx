@@ -3,6 +3,7 @@ import { useFlow } from "../context/FlowContext";
 import { C, TICKERS, EXPIRIES, FONTS } from "../constants/theme";
 import { fmt } from "../lib/format";
 import PixelCard from "./ui/PixelCard";
+import { drawLogo } from "../constants/logos";
 
 interface CellData {
   ticker: string;
@@ -20,6 +21,7 @@ export default function FlowHeatmap() {
   const pulseRef = useRef<Map<string, number>>(new Map());
   const prevTradeIdRef = useRef<number>(-1);
   const rafRef = useRef<number>(0);
+  const ambientTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [hovered, setHovered] = useState<{ cell: CellData; x: number; y: number } | null>(null);
 
   const { cells, sortedTickers, maxCellPrem } = useMemo(() => {
@@ -384,7 +386,7 @@ export default function FlowHeatmap() {
         let pulsing = false;
         if (pt) {
           const age = (now - pt) / 1000;
-          if (age < 1.0) { pulsing = Math.floor(age * 8) % 2 === 0; }
+          if (age < 2.0) { pulsing = Math.floor(age * 3) % 2 === 0; }
           else pulseRef.current.delete(key);
         }
         const bri = maxCellPrem > 0 ? cell.total / maxCellPrem : 0;
@@ -542,18 +544,23 @@ export default function FlowHeatmap() {
           ctx.shadowBlur = 0;
         }
 
-        // Text — bottom-left
+        // Text — bottom-left: amount + direction indicator
         if (winW > 16 && winH > 8) {
-          const fs = Math.min(Math.floor(winH * 0.36), 14);
+          const fs = Math.min(Math.floor(winH * 0.36), 18);
           ctx.font = `${fs}px 'VT323', monospace`;
           ctx.fillStyle = pulsing ? "#ffffff" : `rgba(255,255,255,${0.5 + bri * 0.5})`;
           ctx.textAlign = "left";
           ctx.shadowColor = pulsing ? "#fff" : `rgb(${cr},${cg},${cb})`;
           ctx.shadowBlur = pulsing ? 12 : 5;
-          ctx.fillText(
-            cell.total >= 1e6 ? `${(cell.total / 1e6).toFixed(1)}M` : `${(cell.total / 1e3).toFixed(0)}K`,
-            wx + 2, wy + winH - 2,
-          );
+          const amtStr = cell.total >= 1e6 ? `${(cell.total / 1e6).toFixed(1)}M` : `${(cell.total / 1e3).toFixed(0)}K`;
+          const dirStr = cell.ratio >= 0.5 ? "▲" : "▼";
+          ctx.fillText(amtStr, wx + 2, wy + winH - 2);
+          // Direction arrow in top-right corner
+          if (winW > 24 && winH > 12) {
+            ctx.textAlign = "right";
+            ctx.fillStyle = cell.ratio >= 0.5 ? C.call : C.put;
+            ctx.fillText(dirStr, wx + winW - 2, wy + fs);
+          }
           ctx.shadowBlur = 0;
         }
       }
@@ -749,27 +756,44 @@ export default function FlowHeatmap() {
     }
 
     /* ═══ LABELS ═══ */
-    ctx.font = "14px 'VT323', monospace";
+    ctx.font = "18px 'VT323', monospace";
     ctx.fillStyle = C.dim;
     ctx.textAlign = "center";
     for (let c = 0; c < COLS; c++)
       ctx.fillText(EXPIRIES[c], bL + c * colW + colW / 2, LABEL_H - 2);
 
-    ctx.font = "18px 'VT323', monospace";
+    ctx.font = "22px 'VT323', monospace";
     ctx.textAlign = "right";
     for (let r = 0; r < ROWS; r++) {
+      const ty = bT + r * rowH + rowH / 2 + 5;
+      // Draw pixel logo left of ticker label
+      drawLogo(ctx, sortedTickers[r], 2, ty - 10, 1);
       ctx.fillStyle = C.text;
       ctx.shadowColor = C.accent;
       ctx.shadowBlur = 4;
-      ctx.fillText(sortedTickers[r], TICKER_W - 6, bT + r * rowH + rowH / 2 + 5);
+      ctx.fillText(sortedTickers[r], TICKER_W - 6, ty);
       ctx.shadowBlur = 0;
     }
 
-    // Always animate for shooting star + smoke + twinkling stars
-    rafRef.current = requestAnimationFrame(draw);
+    // 60fps only during pulse flashes, ~12fps ambient for stars/smoke
+    if (pulseRef.current.size > 0) {
+      rafRef.current = requestAnimationFrame(draw);
+    } else {
+      ambientTimer.current = setTimeout(() => {
+        rafRef.current = requestAnimationFrame(draw);
+      }, 80);
+    }
   }, [cells, sortedTickers, maxCellPrem, ROWS]);
 
-  useEffect(() => { cancelAnimationFrame(rafRef.current); draw(); }, [draw]);
+  useEffect(() => {
+    cancelAnimationFrame(rafRef.current);
+    if (ambientTimer.current) clearTimeout(ambientTimer.current);
+    draw();
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      if (ambientTimer.current) clearTimeout(ambientTimer.current);
+    };
+  }, [draw]);
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -777,10 +801,8 @@ export default function FlowHeatmap() {
     ro.observe(el);
     return () => ro.disconnect();
   }, [draw]);
-  useEffect(() => {
-    if (pulseRef.current.size > 0) rafRef.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [trades, draw]);
+  // Trigger redraw on new trades (draw callback already depends on cells which depends on trades)
+  // No extra effect needed — draw is memoized on [cells, sortedTickers, maxCellPrem, ROWS]
 
   const onMouseMove = useCallback((e: React.MouseEvent) => {
     const canvas = canvasRef.current;
@@ -818,11 +840,11 @@ export default function FlowHeatmap() {
           top: Math.max(hovered.y - 76, 8),
           zIndex: 10, background: "#131230",
           border: `2px solid ${C.accent}`, padding: "8px 12px",
-          fontSize: 22, fontFamily: FONTS.mono, color: C.text,
+          fontSize: 26, fontFamily: FONTS.mono, color: C.text,
           pointerEvents: "none", whiteSpace: "nowrap",
           boxShadow: `0 0 20px ${C.accent}30`,
         }}>
-          <div style={{ fontFamily: FONTS.display, fontSize: 9, color: C.accent, marginBottom: 4, textShadow: `0 0 6px ${C.accent}` }}>
+          <div style={{ fontFamily: FONTS.display, fontSize: 12, color: C.accent, marginBottom: 4, textShadow: `0 0 6px ${C.accent}` }}>
             🏢 {hovered.cell.ticker} · {hovered.cell.expiry}
           </div>
           <div style={{ color: C.call, textShadow: `0 0 8px ${C.call}` }}>📈 UP: {fmt(hovered.cell.callPrem)}</div>
