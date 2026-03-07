@@ -68,7 +68,7 @@ function FlowTerminal() {
   const whaleCount = useRef(0);
 
   const onNewTrade = useCallback((trade: Trade) => {
-    if (trade.total > 10e6) {
+    if (trade.total > 5e6) {
       window.dispatchEvent(new CustomEvent("flow:megablock", { detail: trade }));
       playWhale();
       setShaking(true);
@@ -86,7 +86,7 @@ function FlowTerminal() {
   useEffect(() => {
     if (trades.length > prevCount.current && prevCount.current > 0) {
       const latest = trades[0];
-      if (latest && latest.total > 2e6) {
+      if (latest && latest.total > 1e6) {
         setEdgeFlash(true);
         const t = setTimeout(() => setEdgeFlash(false), 500);
         prevCount.current = trades.length;

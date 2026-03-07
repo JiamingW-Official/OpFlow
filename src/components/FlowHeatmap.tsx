@@ -54,11 +54,14 @@ export default function FlowHeatmap() {
     const latest = trades[0];
     if (latest.id !== prevTradeIdRef.current) {
       prevTradeIdRef.current = latest.id;
-      pulseRef.current.set(`${latest.tk}-${latest.exp}`, Date.now());
+      // Only flash windows for meaningful trades ($200K+)
+      if (latest.total > 200_000) {
+        pulseRef.current.set(`${latest.tk}-${latest.exp}`, Date.now());
+      }
     }
   }, [trades]);
 
-  const TICKER_W = 50;
+  const TICKER_W = 64;
   const LABEL_H = 16;
   const ROOF_H = 22;
   const TOP = LABEL_H + ROOF_H;
@@ -386,7 +389,7 @@ export default function FlowHeatmap() {
         let pulsing = false;
         if (pt) {
           const age = (now - pt) / 1000;
-          if (age < 2.0) { pulsing = Math.floor(age * 3) % 2 === 0; }
+          if (age < 0.8) { pulsing = age < 0.15; }
           else pulseRef.current.delete(key);
         }
         const bri = maxCellPrem > 0 ? cell.total / maxCellPrem : 0;
@@ -394,10 +397,10 @@ export default function FlowHeatmap() {
         if (cell.total === 0) { cr = 0; cg = 0; cb = 0; }
         else if (cell.ratio >= 0.5) {
           const t = Math.min((cell.ratio - 0.5) * 2, 1);
-          cr = 0; cg = 200 + Math.round(55 * t); cb = 80 + Math.round(56 * t);
+          cr = 0; cg = 220 + Math.round(35 * t); cb = 40 + Math.round(40 * t);
         } else {
           const t = Math.min((0.5 - cell.ratio) * 2, 1);
-          cr = 240 + Math.round(15 * t); cg = 20; cb = 50 + Math.round(50 * t);
+          cr = 255; cg = 10 + Math.round(20 * t); cb = 30 + Math.round(30 * t);
         }
         cellInfo.push({ r, c, cell, wx, wy, pulsing, bri, cr, cg, cb });
       }
@@ -405,7 +408,7 @@ export default function FlowHeatmap() {
 
     // PASS 1: Glow halos on walls (before windows, so windows draw on top)
     for (const ci of cellInfo) {
-      if (ci.cell.total === 0) continue;
+      if (ci.cell.total === 0 || ci.bri < 0.1) continue;
       const { wx, wy, pulsing, bri, cr, cg, cb } = ci;
       const glowR = pulsing ? 55 : 8 + bri * 30;
       const glowA = pulsing ? 0.45 : 0.06 + bri * 0.2;
@@ -755,6 +758,39 @@ export default function FlowHeatmap() {
       ctx.globalAlpha = 1;
     }
 
+    /* ═══ ENGAGING: sentiment glow + hottest crown ═══ */
+    let totalCallPrem = 0, totalPutPrem = 0;
+    let hottest: typeof cellInfo[0] | null = null;
+    for (const ci of cellInfo) {
+      totalCallPrem += ci.cell.callPrem;
+      totalPutPrem += ci.cell.putPrem;
+      if (!hottest || ci.cell.total > hottest.cell.total) hottest = ci;
+    }
+    // Building edge sentiment glow
+    const sentTotal = totalCallPrem + totalPutPrem;
+    if (sentTotal > 0) {
+      const sentRatio = totalCallPrem / sentTotal;
+      const sentColor = sentRatio >= 0.5 ? C.call : C.put;
+      const sentA = Math.abs(sentRatio - 0.5) * 0.4;
+      const hex = Math.floor(sentA * 255).toString(16).padStart(2, "0");
+      ctx.fillStyle = `${sentColor}${hex}`;
+      ctx.fillRect(bL, bT, 3, bH);
+      ctx.fillRect(bR - 3, bT, 3, bH);
+    }
+    // Golden pixel crown on hottest window
+    if (hottest && hottest.cell.total > 0) {
+      const hx = hottest.wx + Math.floor(winW / 2);
+      const hy = hottest.wy - 7;
+      ctx.fillStyle = "#ffdd66";
+      ctx.shadowColor = "#ffcc00";
+      ctx.shadowBlur = 6;
+      ctx.fillRect(hx - 4, hy + 2, 9, 3);
+      ctx.fillRect(hx - 4, hy, 2, 2);
+      ctx.fillRect(hx, hy - 1, 1, 2);
+      ctx.fillRect(hx + 3, hy, 2, 2);
+      ctx.shadowBlur = 0;
+    }
+
     /* ═══ LABELS ═══ */
     ctx.font = "18px 'VT323', monospace";
     ctx.fillStyle = C.dim;
@@ -762,16 +798,17 @@ export default function FlowHeatmap() {
     for (let c = 0; c < COLS; c++)
       ctx.fillText(EXPIRIES[c], bL + c * colW + colW / 2, LABEL_H - 2);
 
-    ctx.font = "22px 'VT323', monospace";
-    ctx.textAlign = "right";
+    ctx.font = "20px 'VT323', monospace";
+    ctx.textAlign = "center";
     for (let r = 0; r < ROWS; r++) {
-      const ty = bT + r * rowH + rowH / 2 + 5;
-      // Draw pixel logo left of ticker label
-      drawLogo(ctx, sortedTickers[r], 2, ty - 10, 1);
+      const rowCenter = bT + r * rowH + rowH / 2;
+      // Draw pixel logo (2x) centered above ticker text
+      drawLogo(ctx, sortedTickers[r], Math.floor(TICKER_W / 2 - 8), rowCenter - 14, 2);
+      // Ticker name centered below logo
       ctx.fillStyle = C.text;
       ctx.shadowColor = C.accent;
       ctx.shadowBlur = 4;
-      ctx.fillText(sortedTickers[r], TICKER_W - 6, ty);
+      ctx.fillText(sortedTickers[r], TICKER_W / 2, rowCenter + 12);
       ctx.shadowBlur = 0;
     }
 
@@ -781,7 +818,7 @@ export default function FlowHeatmap() {
     } else {
       ambientTimer.current = setTimeout(() => {
         rafRef.current = requestAnimationFrame(draw);
-      }, 80);
+      }, 150);
     }
   }, [cells, sortedTickers, maxCellPrem, ROWS]);
 

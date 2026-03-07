@@ -84,7 +84,7 @@ export function useOptionsStream({ setTrades, setConnectionStatus, onNewTrade }:
         window.dispatchEvent(new CustomEvent("flow:particle-burst", {
           detail: { x: Math.random() * window.innerWidth * 0.6 + window.innerWidth * 0.05, y: Math.random() * window.innerHeight * 0.5 + 80, color: trade.type === "CALL" ? "#00ff88" : "#ff3366" },
         }));
-      }, 2500 + Math.random() * 2500);
+      }, 2000 + Math.random() * 2000);
       return () => clearInterval(id);
     }
   }, [setTrades, setConnectionStatus]);

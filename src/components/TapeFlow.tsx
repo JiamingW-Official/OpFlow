@@ -160,9 +160,9 @@ export default function TapeFlow() {
             return (
               <div key={t.id} className={`trade-row ${i === 0 ? "new-trade" : ""}`} style={{
                 padding: "5px 6px",
-                background: dir ? "rgba(0,255,136,0.03)" : "rgba(255,51,102,0.03)",
+                background: dir ? "rgba(0,255,136,0.06)" : "rgba(255,51,102,0.06)",
                 borderBottom: `1px solid ${dirColor}10`,
-                borderLeft: size.text ? `3px solid ${size.color}` : `3px solid ${dirColor}30`,
+                borderLeft: size.text ? `3px solid ${size.color}` : `3px solid ${dirColor}55`,
                 position: "relative", overflow: "hidden",
               }}>
                 {/* Background size bar */}
