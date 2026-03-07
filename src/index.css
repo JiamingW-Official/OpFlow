@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0f0e17;
+  --color-foreground: #eeeeff;
+  --color-muted: #1a1a2e;
+  --color-muted-foreground: #8888aa;
+  --color-border: #66ccff;
+  --color-ring: rgba(102, 204, 255, 0.3);
+  --color-primary: #66ccff;
+  --color-primary-foreground: #0f0e17;
+  --color-accent: #1a1a2e;
+  --color-accent-foreground: #eeeeff;
+  --color-destructive: #ff6699;
+  --color-secondary: #1a1a2e;
+  --color-secondary-foreground: #eeeeff;
+  --color-input: rgba(102, 204, 255, 0.15);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+}
+
+html, body, #root {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  background: #0f0e17;
+  font-size: 18px;
+}
+
+/* LED glow text effects */
+.led-glow {
+  text-shadow: 0 0 8px currentColor, 0 0 2px currentColor;
+}
+
+.led-glow-strong {
+  text-shadow: 0 0 12px currentColor, 0 0 4px currentColor, 0 0 20px currentColor;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes pixelBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes pixelBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes pixelSparkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes pixelPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(102, 204, 255, 0.2); }
+  50% { box-shadow: 0 0 16px rgba(255, 136, 187, 0.4); }
+}
+
+@keyframes pixelShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes rainbowBorder {
+  0% { border-color: #66ccff; }
+  25% { border-color: #ff88bb; }
+  50% { border-color: #ffdd66; }
+  75% { border-color: #cc88ff; }
+  100% { border-color: #66ccff; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { text-shadow: 0 0 4px currentColor; }
+  50% { text-shadow: 0 0 16px currentColor, 0 0 30px currentColor; }
+}
+
+.new-trade {
+  animation: scaleIn 0.2s steps(3) forwards;
+}
+
+.pixel-blink {
+  animation: pixelBlink 0.8s steps(1) infinite;
+}
+
+.pixel-bounce {
+  animation: pixelBounce 1s steps(4) infinite;
+}
+
+.pixel-sparkle {
+  animation: pixelSparkle 1.5s steps(3) infinite;
+}
+
+.pixel-pulse {
+  animation: pixelPulse 1.5s steps(2) infinite;
+}
+
+.pixel-shake {
+  animation: pixelShake 0.15s steps(2) 3;
+}
+
+.pixel-glow-pulse {
+  animation: glowPulse 2s steps(4) infinite;
+}
+
+.rainbow-border {
+  animation: rainbowBorder 3s steps(4) infinite;
+}
+
+.msg-in {
+  animation: fadeIn 0.2s steps(3) forwards;
+}
+
+.toast-in {
+  animation: scaleIn 0.3s steps(4) forwards;
+}
+
+.toast-out {
+  animation: fadeOut 0.3s steps(4) forwards;
+}
+
+/* Pixel scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cc88ff;
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(102, 204, 255, 0.05);
+}
+
+input::placeholder {
+  color: #8888aa;
+}
+
+/* Prevent ALL horizontal overflow */
+*, *::before, *::after {
+  max-width: 100%;
+}
