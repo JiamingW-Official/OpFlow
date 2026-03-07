@@ -134,6 +134,24 @@ export default function FlowHeatmap() {
     ctx.fillRect(mX + 3, mY + 2, 2, 4);
     ctx.fillRect(mX + 4, mY + 1, 1, 6);
 
+    // Shooting star — periodic streak
+    const shootPhase = (now / 3000) % 1;
+    if (shootPhase < 0.25) {
+      const sp = shootPhase / 0.25; // 0→1
+      const ssX = bL + bW * 0.2 + sp * bW * 0.5;
+      const ssY = 2 + sp * (bT - 6);
+      ctx.fillStyle = `rgba(255,255,255,${0.8 - sp * 0.7})`;
+      ctx.shadowColor = "#aaddff";
+      ctx.shadowBlur = 6;
+      ctx.fillRect(ssX, ssY, 2, 1);
+      // Tail
+      for (let ti = 1; ti <= 4; ti++) {
+        ctx.fillStyle = `rgba(200,220,255,${Math.max(0.5 - ti * 0.12 - sp * 0.3, 0)})`;
+        ctx.fillRect(ssX - ti * 3, ssY - ti, 2, 1);
+      }
+      ctx.shadowBlur = 0;
+    }
+
     /* ═══ WALLS — pixel bricks ═══ */
     const brickW = 8, brickH = 4;     // pixel brick size
     const mortarC = "#080618";         // dark mortar
@@ -184,6 +202,27 @@ export default function FlowHeatmap() {
     ctx.fillRect(bL, bT, 2, bH);
     ctx.fillStyle = "rgba(0,0,0,0.55)";
     ctx.fillRect(bR - 2, bT, 2, bH);
+
+    // Corner quoins — decorative stone corners
+    const quoinW = 6, quoinH = 8;
+    for (let qy = bT + 2; qy < bB - quoinH; qy += quoinH + 4) {
+      // Left quoins
+      ctx.fillStyle = "#2e2658";
+      ctx.fillRect(bL, qy, quoinW, quoinH);
+      ctx.fillStyle = "rgba(255,255,255,0.08)";
+      ctx.fillRect(bL, qy, quoinW, 1);
+      ctx.fillRect(bL, qy, 1, quoinH);
+      ctx.fillStyle = "rgba(0,0,0,0.2)";
+      ctx.fillRect(bL, qy + quoinH - 1, quoinW, 1);
+      // Right quoins
+      ctx.fillStyle = "#2a2254";
+      ctx.fillRect(bR - quoinW, qy, quoinW, quoinH);
+      ctx.fillStyle = "rgba(255,255,255,0.05)";
+      ctx.fillRect(bR - quoinW, qy, quoinW, 1);
+      ctx.fillStyle = "rgba(0,0,0,0.25)";
+      ctx.fillRect(bR - quoinW, qy + quoinH - 1, quoinW, 1);
+      ctx.fillRect(bR - 1, qy, 1, quoinH);
+    }
 
     /* ═══ ROOF — peaked with shingles ═══ */
     const oh = 8;
@@ -327,7 +366,6 @@ export default function FlowHeatmap() {
     ctx.fillRect(bL - 4, bB, bW + 8, 1);
 
     /* ═══ WINDOW GLOW PRE-PASS — paint wall glow first ═══ */
-    let hasPulse = false;
     const muntW = winW > 35 ? 3 : 2;
     const muntH = winH > 14 ? 3 : 2;
 
@@ -346,7 +384,7 @@ export default function FlowHeatmap() {
         let pulsing = false;
         if (pt) {
           const age = (now - pt) / 1000;
-          if (age < 1.0) { pulsing = Math.floor(age * 8) % 2 === 0; hasPulse = true; }
+          if (age < 1.0) { pulsing = Math.floor(age * 8) % 2 === 0; }
           else pulseRef.current.delete(key);
         }
         const bri = maxCellPrem > 0 ? cell.total / maxCellPrem : 0;
@@ -550,32 +588,164 @@ export default function FlowHeatmap() {
 
       /* ── Sill decorations ── */
       if (cell.total === 0) {
-        const decor = (r * 7 + c * 3 + 1) % 9;
+        const decor = (r * 7 + c * 3 + 1) % 12;
         const mid = Math.floor(slx + slw / 2);
         if (decor === 0 || decor === 5) {
+          // Flower pot
           ctx.fillStyle = "#cc6644"; ctx.fillRect(mid - 2, sly - 2, 4, 2);
           ctx.fillStyle = "#44cc66"; ctx.fillRect(mid - 1, sly - 4, 2, 2);
           ctx.fillStyle = "#66dd88"; ctx.fillRect(mid, sly - 5, 1, 1);
+          ctx.fillStyle = "#ff6688"; ctx.fillRect(mid + 1, sly - 5, 1, 1); // flower
         } else if (decor === 2) {
+          // Pixel cat sitting
           ctx.fillStyle = "#ffcc88"; ctx.fillRect(mid - 2, sly - 3, 4, 3);
-          ctx.fillStyle = "#ffbb77"; ctx.fillRect(mid - 2, sly - 4, 1, 1); ctx.fillRect(mid + 1, sly - 4, 1, 1);
-          ctx.fillStyle = "#ffcc88"; ctx.fillRect(mid + 2, sly - 2, 2, 1);
-          ctx.fillStyle = "#33aa55"; ctx.fillRect(mid - 1, sly - 3, 1, 1); ctx.fillRect(mid + 1, sly - 3, 1, 1);
+          ctx.fillStyle = "#ffbb77"; ctx.fillRect(mid - 2, sly - 4, 1, 1); ctx.fillRect(mid + 1, sly - 4, 1, 1); // ears
+          ctx.fillStyle = "#222"; ctx.fillRect(mid - 1, sly - 3, 1, 1); ctx.fillRect(mid, sly - 3, 1, 1); // eyes
+          ctx.fillStyle = "#ffcc88"; ctx.fillRect(mid + 2, sly - 2, 2, 1); // tail
         } else if (decor === 4) {
-          ctx.fillStyle = "#44aa55"; ctx.fillRect(mid, sly - 5, 2, 5); ctx.fillRect(mid - 1, sly - 3, 1, 2); ctx.fillRect(mid + 2, sly - 2, 1, 1);
-          ctx.fillStyle = "#cc6644"; ctx.fillRect(mid - 1, sly - 1, 4, 1);
+          // Cactus
+          ctx.fillStyle = "#44aa55"; ctx.fillRect(mid, sly - 5, 2, 5);
+          ctx.fillRect(mid - 1, sly - 3, 1, 2); ctx.fillRect(mid + 2, sly - 2, 1, 1);
+          ctx.fillStyle = "#cc6644"; ctx.fillRect(mid - 1, sly - 1, 4, 1); // pot
+        } else if (decor === 6) {
+          // Bird on sill
+          ctx.fillStyle = "#6699cc"; ctx.fillRect(mid, sly - 3, 3, 2); // body
+          ctx.fillStyle = "#5588bb"; ctx.fillRect(mid - 1, sly - 4, 2, 1); // head
+          ctx.fillStyle = "#ffaa44"; ctx.fillRect(mid - 2, sly - 4, 1, 1); // beak
+          ctx.fillStyle = "#6699cc"; ctx.fillRect(mid + 3, sly - 4, 1, 1); // tail
+        } else if (decor === 8) {
+          // Book stack
+          ctx.fillStyle = "#8844aa"; ctx.fillRect(mid - 2, sly - 2, 5, 2);
+          ctx.fillStyle = "#4488cc"; ctx.fillRect(mid - 1, sly - 3, 4, 1);
+          ctx.fillStyle = "#cc6644"; ctx.fillRect(mid - 2, sly - 4, 5, 1);
+        } else if (decor === 10) {
+          // Candle
+          ctx.fillStyle = "#ccaa88"; ctx.fillRect(mid, sly - 3, 2, 3); // wax
+          ctx.fillStyle = "#ffcc44"; ctx.fillRect(mid, sly - 4, 2, 1); // flame
+          ctx.fillStyle = "#ffee88";
+          ctx.shadowColor = "#ffcc44"; ctx.shadowBlur = 4;
+          ctx.fillRect(mid, sly - 5, 1, 1); // flame tip
+          ctx.shadowBlur = 0;
         }
       }
     }
 
-    /* ═══ GROUND GLOW — atmospheric light from building ═══ */
+    /* ═══ DOOR — grand entrance at bottom center ═══ */
+    if (ROWS > 0) {
+      const doorW = Math.min(Math.floor(colW * 0.6), 24);
+      const doorH = Math.min(Math.floor(rowH * 0.9), 30);
+      const doorX = Math.floor(bL + bW / 2 - doorW / 2);
+      const doorY = bB - doorH;
+
+      // Door frame
+      ctx.fillStyle = "#3a3268";
+      ctx.fillRect(doorX - 2, doorY - 3, doorW + 4, doorH + 3);
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fillRect(doorX - 2, doorY - 3, doorW + 4, 1);
+      ctx.fillRect(doorX - 2, doorY - 3, 1, doorH + 3);
+
+      // Arch top
+      ctx.fillStyle = "#3a3268";
+      ctx.fillRect(doorX, doorY - 5, doorW, 3);
+      ctx.fillStyle = "#4a4278";
+      ctx.fillRect(doorX + 2, doorY - 5, doorW - 4, 1);
+
+      // Door panels — dark wood
+      const halfDoor = Math.floor(doorW / 2) - 1;
+      ctx.fillStyle = "#1a1238";
+      ctx.fillRect(doorX, doorY, halfDoor, doorH);
+      ctx.fillRect(doorX + halfDoor + 2, doorY, doorW - halfDoor - 2, doorH);
+      // Center seam
+      ctx.fillStyle = "#0e0a28";
+      ctx.fillRect(doorX + halfDoor, doorY, 2, doorH);
+      // Panel highlights
+      ctx.fillStyle = "rgba(255,255,255,0.04)";
+      ctx.fillRect(doorX + 1, doorY + 1, halfDoor - 2, doorH - 2);
+      // Doorknob
+      ctx.fillStyle = "#cc9944";
+      ctx.shadowColor = "#ffcc66";
+      ctx.shadowBlur = 4;
+      ctx.fillRect(doorX + halfDoor - 3, doorY + Math.floor(doorH * 0.55), 2, 2);
+      ctx.shadowBlur = 0;
+
+      // Light above door
+      ctx.fillStyle = "#ffdd88";
+      ctx.shadowColor = "#ffcc66";
+      ctx.shadowBlur = 16;
+      ctx.fillRect(doorX + Math.floor(doorW / 2) - 1, doorY - 7, 3, 2);
+      ctx.shadowBlur = 0;
+      // Light spill on ground
+      ctx.fillStyle = "rgba(255,220,136,0.06)";
+      ctx.fillRect(doorX - 4, bB, doorW + 8, FOUND_H + 4);
+    }
+
+    /* ═══ DRAINPIPE — right side ═══ */
+    const pipeX = bR - 8;
+    ctx.fillStyle = "#2a2650";
+    ctx.fillRect(pipeX, bT + 4, 3, bH - 4);
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.fillRect(pipeX, bT + 4, 1, bH - 4);
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(pipeX + 2, bT + 4, 1, bH - 4);
+    // Pipe brackets
+    for (let py = bT + 20; py < bB - 10; py += 30) {
+      ctx.fillStyle = "#3a3668";
+      ctx.fillRect(pipeX - 1, py, 5, 2);
+    }
+    // Pipe elbow at bottom
+    ctx.fillStyle = "#2a2650";
+    ctx.fillRect(pipeX, bB - 2, 8, 3);
+
+    /* ═══ GROUND SCENE — cobblestones + street lamp + reflections ═══ */
     const groundY = bB + FOUND_H;
     if (groundY < H) {
-      const gGrad = ctx.createLinearGradient(0, groundY, 0, Math.min(groundY + 20, H));
-      gGrad.addColorStop(0, "rgba(60,50,100,0.08)");
-      gGrad.addColorStop(1, "transparent");
-      ctx.fillStyle = gGrad;
-      ctx.fillRect(bL - 8, groundY, bW + 16, 20);
+      // Cobblestone street
+      const streetH = Math.min(H - groundY, 24);
+      ctx.fillStyle = "#0c0a22";
+      ctx.fillRect(bL - 12, groundY, bW + 24, streetH);
+      // Cobblestone pattern
+      for (let gy = groundY; gy < groundY + streetH; gy += 4) {
+        const goff = (Math.floor((gy - groundY) / 4) % 2) * 5;
+        for (let gx = bL - 12 + goff; gx < bR + 12; gx += 10) {
+          ctx.fillStyle = "#100e28";
+          ctx.fillRect(gx, gy, 8, 3);
+          ctx.fillStyle = "rgba(255,255,255,0.02)";
+          ctx.fillRect(gx, gy, 8, 1);
+        }
+      }
+
+      // Street lamp — left side
+      const lampX = bL - 10;
+      if (lampX > 6) {
+        // Pole
+        ctx.fillStyle = "#2a2850";
+        ctx.fillRect(lampX, groundY - 18, 2, 18);
+        // Arm
+        ctx.fillRect(lampX, groundY - 18, 6, 2);
+        // Lamp housing
+        ctx.fillStyle = "#3a3668";
+        ctx.fillRect(lampX + 3, groundY - 22, 5, 4);
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.fillRect(lampX + 3, groundY - 22, 5, 1);
+        // Lamp light
+        ctx.fillStyle = "#ffdd88";
+        ctx.shadowColor = "#ffcc66";
+        ctx.shadowBlur = 20;
+        ctx.fillRect(lampX + 4, groundY - 20, 3, 2);
+        ctx.shadowBlur = 0;
+        // Light cone on ground
+        ctx.fillStyle = "rgba(255,220,136,0.04)";
+        ctx.fillRect(lampX - 6, groundY, 20, streetH);
+        ctx.fillStyle = "rgba(255,220,136,0.06)";
+        ctx.fillRect(lampX - 2, groundY, 10, Math.min(6, streetH));
+      }
+
+      // Building reflection on wet street
+      const reflH = Math.min(8, streetH);
+      ctx.globalAlpha = 0.03;
+      ctx.fillStyle = "#cc88ff";
+      ctx.fillRect(bL, groundY + 2, bW, reflH);
+      ctx.globalAlpha = 1;
     }
 
     /* ═══ LABELS ═══ */
@@ -595,7 +765,8 @@ export default function FlowHeatmap() {
       ctx.shadowBlur = 0;
     }
 
-    if (hasPulse) rafRef.current = requestAnimationFrame(draw);
+    // Always animate for shooting star + smoke + twinkling stars
+    rafRef.current = requestAnimationFrame(draw);
   }, [cells, sortedTickers, maxCellPrem, ROWS]);
 
   useEffect(() => { cancelAnimationFrame(rafRef.current); draw(); }, [draw]);

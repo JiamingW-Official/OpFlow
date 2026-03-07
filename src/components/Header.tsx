@@ -54,27 +54,47 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Power Level badge */}
+      {/* Power Level badge with fill bar */}
       <div className="rainbow-border" style={{
         padding: "3px 8px",
         border: `2px solid ${power.color}`,
         background: `${power.color}10`,
         display: "flex", alignItems: "center", gap: 4, flexShrink: 0,
+        position: "relative", overflow: "hidden",
       }}>
-        <span style={{ fontSize: 16 }}>{power.emoji}</span>
+        {/* Background fill bar showing progress to next level */}
+        <div style={{
+          position: "absolute", left: 0, top: 0, bottom: 0,
+          width: `${Math.min((totalPrem / (power.level === 5 ? 50e6 : power.level === 4 ? 50e6 : power.level === 3 ? 20e6 : power.level === 2 ? 10e6 : 5e6)) * 100, 100)}%`,
+          background: `${power.color}15`,
+          transition: "width 0.5s steps(8)",
+        }} />
+        <span style={{ fontSize: 16, position: "relative" }}>{power.emoji}</span>
         <span style={{
           fontFamily: FONTS.display, fontSize: 7, color: power.color,
           textShadow: `0 0 8px ${power.color}`,
+          position: "relative",
         }}>LV{power.level} {power.name}</span>
+      </div>
+
+      {/* Trade counter */}
+      <div style={{
+        fontFamily: FONTS.display, fontSize: 7, color: C.dim,
+        flexShrink: 0, display: "flex", alignItems: "center", gap: 3,
+      }}>
+        <span style={{ color: C.accent, textShadow: `0 0 4px ${C.accent}` }}>
+          {trades.length}
+        </span>
+        <span>BETS</span>
       </div>
 
       <div style={{ flex: 1, minWidth: 8 }} />
 
       {/* Stats */}
-      <Stat emoji="💰" val={fmt(totalPrem)} color={C.accent} />
-      <Stat emoji={moodEmoji} val={moodText} color={moodColor} />
-      <Stat emoji="🐋" val={String(blocks)} color={C.gold} />
-      <Stat emoji="⚡" val={String(sweeps)} color={C.violet} />
+      <Stat emoji="💰" val={fmt(totalPrem)} color={C.accent} label="FLOW" />
+      <Stat emoji={moodEmoji} val={moodText} color={moodColor} label="MOOD" />
+      <Stat emoji="🐋" val={String(blocks)} color={C.gold} label="WHALE" />
+      <Stat emoji="⚡" val={String(sweeps)} color={C.violet} label="RUSH" />
 
       <div style={{ width: 2, height: 24, background: "rgba(102,204,255,0.1)", flexShrink: 0 }} />
 
@@ -97,14 +117,17 @@ export default function Header() {
   );
 }
 
-function Stat({ emoji, val, color }: { emoji: string; val: string; color: string }) {
+function Stat({ emoji, val, color, label }: { emoji: string; val: string; color: string; label?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
       <span style={{ fontSize: 18 }}>{emoji}</span>
-      <span style={{
-        fontSize: 24, color, lineHeight: 1,
-        textShadow: `0 0 8px ${color}, 0 0 2px ${color}`,
-      }}>{val}</span>
+      <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
+        {label && <span style={{ fontSize: 8, fontFamily: FONTS.display, color: C.dim, letterSpacing: 1 }}>{label}</span>}
+        <span style={{
+          fontSize: 24, color, lineHeight: 1,
+          textShadow: `0 0 8px ${color}, 0 0 2px ${color}`,
+        }}>{val}</span>
+      </div>
     </div>
   );
 }

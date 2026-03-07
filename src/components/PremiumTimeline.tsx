@@ -109,7 +109,29 @@ export default function PremiumTimeline() {
     drawStep(d => d.callPrem, C.call, "rgba(0,255,136,0.15)");
     drawStep(d => d.putPrem, C.put, "rgba(255,51,102,0.15)");
 
-    // Legend — cute pixel squares with LED glow
+    // Endpoint dots with glow
+    if (data.length > 0) {
+      const last = data[data.length - 1];
+      for (const [getter, color] of [[((d: DataPoint) => d.callPrem), C.call], [((d: DataPoint) => d.putPrem), C.put]] as const) {
+        const x = getX(data.length - 1);
+        const y = getY(getter(last));
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 8;
+        ctx.fillRect(x - 2, y - 2, 4, 4);
+        ctx.shadowBlur = 0;
+        // Value label at endpoint
+        const val = getter(last);
+        if (val > 0) {
+          ctx.font = "14px 'VT323', monospace";
+          ctx.fillStyle = color;
+          ctx.textAlign = "left";
+          ctx.fillText(val >= 1e6 ? `${(val/1e6).toFixed(1)}M` : `${(val/1e3).toFixed(0)}K`, x + 5, y + 4);
+        }
+      }
+    }
+
+    // Legend — pixel squares with LED glow
     ctx.fillStyle = C.call;
     ctx.fillRect(W - 150, 6, 10, 10);
     ctx.font = "18px 'VT323', monospace";

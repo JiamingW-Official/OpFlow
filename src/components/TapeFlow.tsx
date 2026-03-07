@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useFlow } from "../context/FlowContext";
 import { C, TICKERS, FONTS } from "../constants/theme";
 import { fmt } from "../lib/format";
@@ -36,8 +36,39 @@ export default function TapeFlow() {
     + (filters.expiry !== "all" ? 1 : 0)
     + (filters.tickers.length > 0 ? 1 : 0);
 
+  // Streak detection — consecutive same-direction trades
+  const streak = useMemo(() => {
+    if (filtered.length < 2) return { count: 0, type: "CALL" as string };
+    const first = filtered[0].type;
+    let count = 1;
+    for (let i = 1; i < Math.min(filtered.length, 20); i++) {
+      if (filtered[i].type === first) count++;
+      else break;
+    }
+    return { count, type: first };
+  }, [filtered]);
+
   return (
     <PixelCard title="LIVE BETS" titleIcon="🎰" style={{ display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0, minWidth: 0 }}>
+      {/* Streak banner */}
+      {streak.count >= 3 && (
+        <div className="streak-glow" style={{
+          padding: "2px 6px",
+          background: streak.type === "CALL" ? "rgba(0,255,136,0.06)" : "rgba(255,51,102,0.06)",
+          borderBottom: `2px solid ${streak.type === "CALL" ? C.call : C.put}30`,
+          display: "flex", alignItems: "center", gap: 4,
+          fontFamily: FONTS.display, fontSize: 7,
+        }}>
+          <span style={{ fontSize: 14 }}>{streak.type === "CALL" ? "🔥" : "❄️"}</span>
+          <span style={{ color: streak.type === "CALL" ? C.call : C.put, textShadow: `0 0 6px ${streak.type === "CALL" ? C.call : C.put}` }}>
+            {streak.count}x {streak.type === "CALL" ? "UP" : "DOWN"} STREAK!
+          </span>
+          <span style={{ color: C.gold }}>
+            {streak.count >= 5 ? "COMBO!" : ""}
+          </span>
+        </div>
+      )}
+
       {/* Filter bar */}
       <div style={{
         padding: "4px 6px", borderBottom: `3px solid rgba(102,204,255,0.08)`,
@@ -101,52 +132,65 @@ export default function TapeFlow() {
 
       {/* Trade list */}
       <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", minHeight: 0, minWidth: 0 }}>
-        {filtered.slice(0, 50).map((t, i) => {
-          const dir = t.type === "CALL";
-          const dirColor = dir ? C.call : C.put;
-          const size = sizeLabel(t.total);
-          return (
-            <div key={t.id} className={i === 0 ? "new-trade" : ""} style={{
-              padding: "5px 6px",
-              background: i % 2 === 0 ? "rgba(102,204,255,0.02)" : "transparent",
-              borderBottom: "1px solid rgba(102,204,255,0.04)",
-              borderLeft: size.text ? `3px solid ${size.color}` : "3px solid transparent",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 3, overflow: "hidden" }}>
-                <span style={{
-                  fontSize: 24, color: C.bright,
-                  textShadow: `0 0 6px ${C.bright}`,
-                  flexShrink: 0,
-                }}>{t.tk}</span>
-                <span style={{
-                  color: dirColor, fontSize: 20,
-                  textShadow: `0 0 6px ${dirColor}`,
-                  flexShrink: 0,
-                }}>
-                  {dir ? "📈" : "📉"}
-                </span>
-                {size.text && (
-                  <span className="pixel-glow-pulse" style={{
-                    fontFamily: FONTS.display, fontSize: 7,
-                    color: size.color, flexShrink: 0,
-                  }}>{size.text}</span>
-                )}
-                <span style={{
-                  marginLeft: "auto", color: C.gold, fontSize: 22,
-                  textShadow: `0 0 8px ${C.gold}`,
-                  flexShrink: 0,
-                }}>{fmt(t.total)}</span>
+        {(() => {
+          const shown = filtered.slice(0, 50);
+          const maxPrem = shown.length > 0 ? Math.max(...shown.map(t => t.total)) : 1;
+          return shown.map((t, i) => {
+            const dir = t.type === "CALL";
+            const dirColor = dir ? C.call : C.put;
+            const size = sizeLabel(t.total);
+            const relSize = t.total / maxPrem;
+            return (
+              <div key={t.id} className={i === 0 ? "new-trade" : ""} style={{
+                padding: "5px 6px",
+                background: i % 2 === 0 ? "rgba(102,204,255,0.02)" : "transparent",
+                borderBottom: "1px solid rgba(102,204,255,0.04)",
+                borderLeft: size.text ? `3px solid ${size.color}` : "3px solid transparent",
+                position: "relative", overflow: "hidden",
+              }}>
+                {/* Background size bar */}
+                <div style={{
+                  position: "absolute", left: 0, top: 0, bottom: 0,
+                  width: `${relSize * 100}%`,
+                  background: `${dirColor}06`,
+                  pointerEvents: "none",
+                }} />
+                <div style={{ display: "flex", alignItems: "center", gap: 3, overflow: "hidden", position: "relative" }}>
+                  <span style={{
+                    fontSize: 24, color: C.bright,
+                    textShadow: `0 0 6px ${C.bright}`,
+                    flexShrink: 0,
+                  }}>{t.tk}</span>
+                  <span style={{
+                    color: dirColor, fontSize: 20,
+                    textShadow: `0 0 6px ${dirColor}`,
+                    flexShrink: 0,
+                  }}>
+                    {dir ? "📈" : "📉"}
+                  </span>
+                  {size.text && (
+                    <span className="pixel-glow-pulse" style={{
+                      fontFamily: FONTS.display, fontSize: 7,
+                      color: size.color, flexShrink: 0,
+                    }}>{size.text}</span>
+                  )}
+                  <span style={{
+                    marginLeft: "auto", color: C.gold, fontSize: 22,
+                    textShadow: `0 0 8px ${C.gold}`,
+                    flexShrink: 0,
+                  }}>{fmt(t.total)}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 14, color: C.dim, marginTop: 1, overflow: "hidden", position: "relative" }}>
+                  <span>${t.strike}</span>
+                  <span>{t.exp}</span>
+                  <span>{t.vol.toLocaleString()}</span>
+                  {t.isBlock && <span style={{ color: C.gold }}>🐋</span>}
+                  {t.isSweep && <span style={{ color: C.violet }}>⚡</span>}
+                </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 14, color: C.dim, marginTop: 1, overflow: "hidden" }}>
-                <span>${t.strike}</span>
-                <span>{t.exp}</span>
-                <span>{t.vol.toLocaleString()}</span>
-                {t.isBlock && <span style={{ color: C.gold }}>🐋</span>}
-                {t.isSweep && <span style={{ color: C.violet }}>⚡</span>}
-              </div>
-            </div>
-          );
-        })}
+            );
+          });
+        })()}
       </div>
     </PixelCard>
   );

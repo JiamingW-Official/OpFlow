@@ -44,6 +44,8 @@ export default function TickerHeat() {
               padding: "3px 2px",
               borderBottom: "1px solid rgba(102,204,255,0.04)",
               overflow: "hidden", minWidth: 0,
+              background: i === 0 && d.total > 0 ? `linear-gradient(90deg, ${barColor}08, transparent)` : undefined,
+              borderLeft: i < 3 && d.total > 0 ? `2px solid ${barColor}40` : "2px solid transparent",
             }}>
               <span style={{ fontSize: 14, width: 18, textAlign: "center", flexShrink: 0 }}>
                 {i < 3 ? RANK_MEDALS[i] : <span style={{ fontFamily: FONTS.display, fontSize: 6, color: C.dim }}>#{i+1}</span>}
@@ -57,24 +59,68 @@ export default function TickerHeat() {
                 {d.tk}
               </span>
 
-              {/* Power bar */}
+              {/* Power bar — dual split (call/put) */}
               <div style={{
-                flex: 1, height: 12, background: "rgba(102,204,255,0.04)",
+                flex: 1, height: 14, background: "rgba(102,204,255,0.04)",
                 position: "relative", overflow: "hidden", minWidth: 0,
+                border: "1px solid rgba(102,204,255,0.06)",
               }}>
+                {/* Call portion */}
                 <div style={{
                   position: "absolute", left: 0, top: 0, bottom: 0,
-                  width: `${barPct}%`,
-                  background: `linear-gradient(90deg, ${barColor}, ${isUp ? "#88ffcc" : "#ff88bb"})`,
-                  opacity: 0.7,
-                  boxShadow: barPct > 0 ? `0 0 8px ${barColor}40` : "none",
+                  width: `${barPct * d.ratio}%`,
+                  background: `linear-gradient(90deg, ${C.call}88, ${C.call})`,
+                  opacity: 0.8,
                   transition: "width 0.3s steps(8)",
                 }} />
+                {/* Put portion — stacked after call */}
+                <div style={{
+                  position: "absolute", left: `${barPct * d.ratio}%`, top: 0, bottom: 0,
+                  width: `${barPct * (1 - d.ratio)}%`,
+                  background: `linear-gradient(90deg, ${C.put}88, ${C.put})`,
+                  opacity: 0.8,
+                  transition: "width 0.3s steps(8), left 0.3s steps(8)",
+                }} />
+                {/* Inner glow for top entries */}
+                {i < 3 && barPct > 20 && (
+                  <div style={{
+                    position: "absolute", left: 0, top: 0, bottom: 0,
+                    width: `${barPct}%`,
+                    boxShadow: `0 0 12px ${barColor}50, inset 0 1px 0 rgba(255,255,255,0.12)`,
+                    pointerEvents: "none",
+                  }} />
+                )}
+                {/* Center ratio indicator */}
+                {barPct > 30 && (
+                  <div style={{
+                    position: "absolute", left: `${barPct * d.ratio}%`, top: 0, bottom: 0,
+                    width: 1, background: "rgba(255,255,255,0.25)",
+                    transform: "translateX(-0.5px)",
+                  }} />
+                )}
+                {/* Bar segment markers */}
+                {barPct > 0 && [25, 50, 75].map(mark => (
+                  <div key={mark} style={{
+                    position: "absolute", left: `${mark}%`, top: 0, bottom: 0,
+                    width: 1, background: "rgba(255,255,255,0.04)",
+                  }} />
+                ))}
               </div>
 
-              <span style={{ fontSize: 12, color: C.dim, flexShrink: 0, width: 52, textAlign: "right", overflow: "hidden", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 12, color: C.dim, flexShrink: 0, width: 56, textAlign: "right", overflow: "hidden", whiteSpace: "nowrap" }}>
                 {vibe}
               </span>
+
+              {/* Call ratio mini indicator */}
+              {d.count > 0 && (
+                <span style={{
+                  fontSize: 12, flexShrink: 0, width: 24, textAlign: "right",
+                  color: isUp ? C.call : C.put,
+                  opacity: 0.6,
+                }}>
+                  {Math.round(d.ratio * 100)}%
+                </span>
+              )}
 
               <span style={{
                 fontSize: 16, flexShrink: 0, width: 40, textAlign: "right",
