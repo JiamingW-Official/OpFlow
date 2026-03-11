@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useRef, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useState, useRef, useMemo, useEffect, type ReactNode } from "react";
 import type { Trade, Filters, ConnectionStatus } from "../types";
-import { generateInitialTrades } from "../lib/format";
+import { generateInitialTrades, persistTrades } from "../lib/format";
 
 interface FlowContextValue {
   trades: Trade[];
@@ -33,6 +33,9 @@ export function FlowProvider({ children }: { children: ReactNode }) {
 
   const tradesRef = useRef<Trade[]>(trades);
   tradesRef.current = trades;
+
+  // Persist trades to sessionStorage so they survive refresh
+  useEffect(() => { persistTrades(trades); }, [trades]);
 
   const vizCanvasRef = useRef<HTMLCanvasElement | null>(null);
 

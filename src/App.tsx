@@ -124,7 +124,7 @@ function FlowTerminal() {
 
         <div style={{
           display: "grid",
-          gridTemplateColumns: "1fr 2fr 1.2fr",
+          gridTemplateColumns: "0.7fr 2.3fr 1.2fr",
           gap: 8,
           overflow: "hidden",
           minHeight: 0,
@@ -134,7 +134,7 @@ function FlowTerminal() {
 
           <div style={{
             display: "grid",
-            gridTemplateRows: "1fr 150px",
+            gridTemplateRows: "1fr 110px",
             gap: 8,
             overflow: "hidden",
             minHeight: 0,
