@@ -71,12 +71,12 @@ export default function FlowHeatmap() {
     }
   }, [trades]);
 
-  const TICKER_W = 46;
+  const TICKER_W = 36;
   const LABEL_H = 16;
   const ROOF_H = 16;
   const TOP = LABEL_H + ROOF_H;
-  const FOUND_H = 6;
-  const WPAD = 10;
+  const FOUND_H = 0;
+  const WPAD = 6;
   const COLS = EXPIRIES.length;
   const ROWS = sortedTickers.length;
 
@@ -101,7 +101,7 @@ export default function FlowHeatmap() {
 
     const W = rect.width, H = rect.height;
     const bL = TICKER_W, bT = TOP;
-    const bW = W - bL - 4, bH = H - bT - 4 - FOUND_H;
+    const bW = W - bL - 2, bH = H - bT - 2;
     const bB = bT + bH, bR = bL + bW;
     const colW = bW / COLS, rowH = bH / ROWS;
     const winW = colW - WPAD * 2, winH = rowH - WPAD * 2;
@@ -785,43 +785,6 @@ export default function FlowHeatmap() {
       }
     }
 
-    /* ═══ DOOR — sits in foundation zone, not over bottom windows ═══ */
-    if (ROWS > 0) {
-      const doorW = Math.min(Math.floor(colW * 0.6), 24);
-      const doorH = Math.min(FOUND_H + 4, 16);
-      const doorX = Math.floor(bL + bW / 2 - doorW / 2);
-      const doorY = bB - 2;
-      ctx.fillStyle = "#3a3268";
-      ctx.fillRect(doorX - 2, doorY - 3, doorW + 4, doorH + 3);
-      ctx.fillStyle = "rgba(255,255,255,0.06)";
-      ctx.fillRect(doorX - 2, doorY - 3, doorW + 4, 1);
-      ctx.fillRect(doorX - 2, doorY - 3, 1, doorH + 3);
-      ctx.fillStyle = "#3a3268";
-      ctx.fillRect(doorX, doorY - 5, doorW, 3);
-      ctx.fillStyle = "#4a4278";
-      ctx.fillRect(doorX + 2, doorY - 5, doorW - 4, 1);
-      const halfDoor = Math.floor(doorW / 2) - 1;
-      ctx.fillStyle = "#1a1238";
-      ctx.fillRect(doorX, doorY, halfDoor, doorH);
-      ctx.fillRect(doorX + halfDoor + 2, doorY, doorW - halfDoor - 2, doorH);
-      ctx.fillStyle = "#0e0a28";
-      ctx.fillRect(doorX + halfDoor, doorY, 2, doorH);
-      ctx.fillStyle = "rgba(255,255,255,0.04)";
-      ctx.fillRect(doorX + 1, doorY + 1, halfDoor - 2, doorH - 2);
-      ctx.fillStyle = "#cc9944";
-      ctx.shadowColor = "#ffcc66";
-      ctx.shadowBlur = 4;
-      ctx.fillRect(doorX + halfDoor - 3, doorY + Math.floor(doorH * 0.55), 2, 2);
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = "#ffdd88";
-      ctx.shadowColor = "#ffcc66";
-      ctx.shadowBlur = 16;
-      ctx.fillRect(doorX + Math.floor(doorW / 2) - 1, doorY - 7, 3, 2);
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = "rgba(255,220,136,0.06)";
-      ctx.fillRect(doorX - 4, bB, doorW + 8, FOUND_H + 4);
-    }
-
     /* ═══ PIXEL CAR on street — animated ═══ */
     if (groundY < H) {
       const carPos = ((now / 30) % (bW + 40)) - 20;
@@ -922,15 +885,15 @@ export default function FlowHeatmap() {
     for (let c = 0; c < COLS; c++)
       ctx.fillText(EXPIRIES[c], bL + c * colW + colW / 2, LABEL_H - 2);
 
-    ctx.font = "16px 'VT323', monospace";
+    ctx.font = "14px 'VT323', monospace";
     ctx.textAlign = "center";
     for (let r = 0; r < ROWS; r++) {
       const rowCenter = bT + r * rowH + rowH / 2;
-      drawLogo(ctx, sortedTickers[r], Math.floor(TICKER_W / 2 - 6), rowCenter - 12, 1.5);
+      drawLogo(ctx, sortedTickers[r], Math.floor(TICKER_W / 2 - 5), rowCenter - 10, 1.2);
       ctx.fillStyle = C.text;
       ctx.shadowColor = C.accent;
-      ctx.shadowBlur = 4;
-      ctx.fillText(sortedTickers[r], TICKER_W / 2, rowCenter + 10);
+      ctx.shadowBlur = 3;
+      ctx.fillText(sortedTickers[r], TICKER_W / 2, rowCenter + 8);
       ctx.shadowBlur = 0;
     }
 
