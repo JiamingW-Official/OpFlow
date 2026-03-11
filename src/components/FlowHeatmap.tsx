@@ -52,6 +52,14 @@ export default function FlowHeatmap() {
     return { cells: cellMap, sortedTickers: sorted, maxCellPrem: max };
   }, [trades]);
 
+  // Data refs — lets draw() read latest data without recreating the callback
+  const cellsRef = useRef(cells);
+  cellsRef.current = cells;
+  const sortedTickersRef = useRef(sortedTickers);
+  sortedTickersRef.current = sortedTickers;
+  const maxPremRef = useRef(maxCellPrem);
+  maxPremRef.current = maxCellPrem;
+
   useEffect(() => {
     if (trades.length === 0) return;
     const latest = trades[0];
@@ -77,6 +85,12 @@ export default function FlowHeatmap() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // Read from refs for stable callback
+    const cells = cellsRef.current;
+    const sortedTickers = sortedTickersRef.current;
+    const maxCellPrem = maxPremRef.current;
+    const ROWS = sortedTickers.length;
 
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
@@ -929,7 +943,8 @@ export default function FlowHeatmap() {
         rafRef.current = requestAnimationFrame(draw);
       }, hasWeather ? 120 : 200);
     }
-  }, [cells, sortedTickers, maxCellPrem, ROWS]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     cancelAnimationFrame(rafRef.current);
@@ -939,12 +954,15 @@ export default function FlowHeatmap() {
       cancelAnimationFrame(rafRef.current);
       if (ambientTimer.current) clearTimeout(ambientTimer.current);
     };
-  }, [draw]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cells, sortedTickers, maxCellPrem]);
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const ro = new ResizeObserver(() => {
-      cacheKeyRef.current = ""; // force cache rebuild on resize
+      cacheKeyRef.current = "";
+      cancelAnimationFrame(rafRef.current);
+      if (ambientTimer.current) clearTimeout(ambientTimer.current);
       draw();
     });
     ro.observe(el);
