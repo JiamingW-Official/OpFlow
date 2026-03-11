@@ -8,6 +8,7 @@ import PremiumTimeline from "./components/PremiumTimeline";
 import AIAnalyst from "./components/AIAnalyst";
 import TickerHeat from "./components/TickerHeat";
 import ToastAlert from "./components/ToastAlert";
+import MarketPulse from "./components/MarketPulse";
 import CursorTrail from "./components/ui/CursorTrail";
 import MilestonePopup from "./components/MilestonePopup";
 import { C, FONTS } from "./constants/theme";
@@ -62,7 +63,7 @@ const CornerHUD = memo(function CornerHUD() {
 
 function FlowTerminal() {
   const { setTrades, setConnectionStatus, trades } = useFlow();
-  const [edgeFlash, setEdgeFlash] = useState(false);
+  const [edgeFlash, setEdgeFlash] = useState<"call" | "put" | false>(false);
   const [shaking, setShaking] = useState(false);
   const prevCount = useRef(0);
   const whaleCount = useRef(0);
@@ -82,12 +83,12 @@ function FlowTerminal() {
     }
   }, []);
 
-  // Screen edge flash only on large trades ($2M+)
+  // Screen edge flash — green for CALL, red for PUT
   useEffect(() => {
     if (trades.length > prevCount.current && prevCount.current > 0) {
       const latest = trades[0];
       if (latest && latest.total > 1e6) {
-        setEdgeFlash(true);
+        setEdgeFlash(latest.type === "CALL" ? "call" : "put");
         const t = setTimeout(() => setEdgeFlash(false), 500);
         prevCount.current = trades.length;
         return () => clearTimeout(t);
@@ -145,13 +146,14 @@ function FlowTerminal() {
 
           <div style={{
             display: "grid",
-            gridTemplateRows: "auto auto 1fr",
+            gridTemplateRows: "auto auto auto 1fr",
             gap: 8,
             overflow: "hidden",
             minHeight: 0,
             minWidth: 0,
           }}>
             <ToastAlert />
+            <MarketPulse />
             <TickerHeat />
             <AIAnalyst />
           </div>
@@ -160,9 +162,9 @@ function FlowTerminal() {
 
       <StatusBar />
 
-      {/* Screen edge flash on new trade */}
+      {/* Screen edge flash — green for CALL, red for PUT */}
       {edgeFlash && (
-        <div className="edge-flash" style={{
+        <div className={edgeFlash === "call" ? "edge-flash-call" : "edge-flash-put"} style={{
           position: "fixed", inset: 0,
           pointerEvents: "none", zIndex: 9997,
         }} />

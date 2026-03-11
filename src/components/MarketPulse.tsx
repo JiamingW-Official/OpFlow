@@ -1,0 +1,113 @@
+import { useMemo, useState, useEffect } from "react";
+import { useFlow } from "../context/FlowContext";
+import { C, FONTS } from "../constants/theme";
+import { fmt } from "../lib/format";
+import PixelCard from "./ui/PixelCard";
+
+const TIPS = [
+  { icon: "📞", text: "CALL = bet price goes UP. Big call flow = traders are bullish!" },
+  { icon: "📉", text: "PUT = bet price goes DOWN. Heavy put flow = bearish signal!" },
+  { icon: "⚡", text: "SWEEP = urgent buy across multiple exchanges. Shows serious conviction!" },
+  { icon: "🐋", text: "BLOCK = massive single trade ($5M+). Whales move markets — follow them!" },
+  { icon: "📊", text: "C/P Ratio > 1.0 = more calls than puts = bullish. < 1.0 = bearish." },
+  { icon: "🏢", text: "Building windows: bright green = calls dominate, bright red = puts dominate." },
+  { icon: "💰", text: "Premium = price × volume × 100. Bigger premium = stronger conviction!" },
+  { icon: "🔥", text: "Sudden spike in a ticker? Smart money might know something!" },
+  { icon: "🎯", text: "Near-the-money options = aggressive bet. Far out = cheaper lottery tickets." },
+  { icon: "📅", text: "Short expiry = aggressive bet needing a fast move. Long expiry = patient thesis." },
+  { icon: "🌊", text: "\"Flow\" = real-time stream of options trades. It shows what big money is doing RIGHT NOW." },
+  { icon: "👑", text: "The golden crown marks the hottest window — most money flowing into that strike + expiry." },
+];
+
+export default function MarketPulse() {
+  const { trades, callRatio } = useFlow();
+  const [tipIdx, setTipIdx] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setTipIdx(i => (i + 1) % TIPS.length), 7000);
+    return () => clearInterval(id);
+  }, []);
+
+  const stats = useMemo(() => {
+    let callPrem = 0, putPrem = 0;
+    const tickerFlow = new Map<string, number>();
+    for (const t of trades.slice(0, 30)) {
+      if (t.type === "CALL") callPrem += t.total;
+      else putPrem += t.total;
+      tickerFlow.set(t.tk, (tickerFlow.get(t.tk) || 0) + t.total);
+    }
+    let topTicker = "", topFlow = 0;
+    for (const [tk, flow] of tickerFlow) {
+      if (flow > topFlow) { topTicker = tk; topFlow = flow; }
+    }
+    const cpRatio = putPrem > 0 ? callPrem / putPrem : callPrem > 0 ? 99 : 1;
+    return { callPrem, putPrem, topTicker, topFlow, cpRatio };
+  }, [trades]);
+
+  const bullPct = Math.round(callRatio * 100);
+  const barSegs = 20;
+  const bullSegs = Math.round(callRatio * barSegs);
+  const tip = TIPS[tipIdx];
+  const isBull = callRatio >= 0.5;
+
+  return (
+    <PixelCard title="MARKET PULSE" titleIcon="📊" titleColor={C.accent}>
+      <div style={{ padding: "6px 8px", display: "flex", flexDirection: "column", gap: 5 }}>
+        {/* Pixel sentiment bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <span style={{ fontSize: 16, flexShrink: 0 }}>🐂</span>
+          <div style={{ flex: 1, display: "flex", height: 12, gap: 1 }}>
+            {Array.from({ length: barSegs }, (_, i) => (
+              <div key={i} style={{
+                flex: 1,
+                background: i < bullSegs ? C.call : C.put,
+                opacity: i < bullSegs ? 0.85 : 0.65,
+                boxShadow: i === bullSegs - 1 || i === bullSegs
+                  ? `0 0 6px ${i < bullSegs ? C.call : C.put}` : undefined,
+              }} />
+            ))}
+          </div>
+          <span style={{ fontSize: 16, flexShrink: 0 }}>🐻</span>
+          <span style={{
+            fontSize: 22, fontFamily: FONTS.mono,
+            color: isBull ? C.call : C.put,
+            textShadow: `0 0 6px ${isBull ? C.call : C.put}`,
+            minWidth: 56, textAlign: "right",
+          }}>{bullPct}%{isBull ? "↑" : "↓"}</span>
+        </div>
+
+        {/* Stats row */}
+        <div style={{
+          display: "flex", gap: 4, fontSize: 18, color: C.dim,
+          flexWrap: "wrap", alignItems: "center",
+        }}>
+          <span style={{ color: C.call, textShadow: `0 0 4px ${C.call}40` }}>▲{fmt(stats.callPrem)}</span>
+          <span style={{ opacity: 0.3 }}>│</span>
+          <span style={{ color: C.put, textShadow: `0 0 4px ${C.put}40` }}>▼{fmt(stats.putPrem)}</span>
+          {stats.topTicker && <>
+            <span style={{ opacity: 0.3 }}>│</span>
+            <span style={{ color: C.gold }}>👑{stats.topTicker}</span>
+          </>}
+          <span style={{ opacity: 0.3 }}>│</span>
+          <span style={{ color: C.accent }}>⚖️{stats.cpRatio.toFixed(1)}</span>
+        </div>
+
+        {/* Educational tip — rotates */}
+        <div key={tipIdx} className="msg-in" style={{
+          padding: "4px 6px",
+          background: "rgba(102,204,255,0.04)",
+          border: "1px solid rgba(102,204,255,0.08)",
+          fontSize: 18, color: C.dim,
+          lineHeight: 1.3,
+        }}>
+          <div style={{
+            fontFamily: FONTS.display, fontSize: 8,
+            color: C.accent, marginBottom: 2,
+            textShadow: `0 0 4px ${C.accent}`,
+          }}>💡 DID YOU KNOW?</div>
+          <div>{tip.icon} {tip.text}</div>
+        </div>
+      </div>
+    </PixelCard>
+  );
+}

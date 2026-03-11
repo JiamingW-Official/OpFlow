@@ -51,19 +51,20 @@ export default function TapeFlow() {
 
   // Sound effects for streak milestones
   const prevStreakRef = useRef(0);
+  const isCallStreak = streak.type === "CALL";
   useEffect(() => {
     if (streak.count >= 5 && prevStreakRef.current < 5) {
-      playCombo();
+      playCombo(isCallStreak);
       if (streak.count >= 10) {
         window.dispatchEvent(new CustomEvent("flow:milestone", {
           detail: { key: "streak-10", emoji: "🔥", text: "10x STREAK!" },
         }));
       }
     } else if (streak.count >= 3 && prevStreakRef.current < 3) {
-      playStreak();
+      playStreak(isCallStreak);
     }
     prevStreakRef.current = streak.count;
-  }, [streak.count]);
+  }, [streak.count, isCallStreak]);
 
   return (
     <PixelCard title="LIVE BETS" titleIcon="🎰" style={{ display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0, minWidth: 0 }}>
@@ -160,31 +161,36 @@ export default function TapeFlow() {
             return (
               <div key={t.id} className={`trade-row ${i === 0 ? "new-trade" : ""}`} style={{
                 padding: "5px 6px",
-                background: dir ? "rgba(0,255,136,0.06)" : "rgba(255,51,102,0.06)",
-                borderBottom: `1px solid ${dirColor}10`,
-                borderLeft: size.text ? `3px solid ${size.color}` : `3px solid ${dirColor}55`,
+                background: dir
+                  ? "linear-gradient(90deg, rgba(0,255,136,0.1) 0%, rgba(0,255,136,0.03) 100%)"
+                  : "linear-gradient(90deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.03) 100%)",
+                borderBottom: `1px solid ${dirColor}15`,
+                borderLeft: size.text ? `4px solid ${size.color}` : `4px solid ${dirColor}88`,
                 position: "relative", overflow: "hidden",
               }}>
                 {/* Background size bar */}
                 <div style={{
                   position: "absolute", left: 0, top: 0, bottom: 0,
                   width: `${relSize * 100}%`,
-                  background: `${dirColor}06`,
+                  background: `${dirColor}08`,
                   pointerEvents: "none",
                 }} />
-                <div style={{ display: "flex", alignItems: "center", gap: 3, overflow: "hidden", position: "relative" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, overflow: "hidden", position: "relative" }}>
+                  {/* Direction badge */}
+                  <span style={{
+                    fontSize: 12, fontFamily: FONTS.display,
+                    color: dir ? "#001a08" : "#1a0008",
+                    background: dirColor,
+                    padding: "1px 4px",
+                    textShadow: "none",
+                    flexShrink: 0,
+                    letterSpacing: 1,
+                  }}>{dir ? "▲UP" : "▼DN"}</span>
                   <span style={{
                     fontSize: 30, color: C.bright,
                     textShadow: `0 0 6px ${C.bright}`,
                     flexShrink: 0,
                   }}>{t.tk}</span>
-                  <span style={{
-                    color: dirColor, fontSize: 24,
-                    textShadow: `0 0 6px ${dirColor}`,
-                    flexShrink: 0,
-                  }}>
-                    {dir ? "📈" : "📉"}
-                  </span>
                   {size.text && (
                     <span className="pixel-glow-pulse" style={{
                       fontFamily: FONTS.display, fontSize: 10,
@@ -192,12 +198,14 @@ export default function TapeFlow() {
                     }}>{size.text}</span>
                   )}
                   <span style={{
-                    marginLeft: "auto", color: C.gold, fontSize: 28,
-                    textShadow: `0 0 8px ${C.gold}`,
+                    marginLeft: "auto", color: dirColor, fontSize: 28,
+                    textShadow: `0 0 8px ${dirColor}`,
                     flexShrink: 0,
+                    fontWeight: "bold",
                   }}>{fmt(t.total)}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 18, color: C.dim, marginTop: 1, overflow: "hidden", position: "relative" }}>
+                  <span style={{ color: dirColor, opacity: 0.7 }}>{dir ? "📈" : "📉"}</span>
                   <span>${t.strike}</span>
                   <span>{t.exp}</span>
                   <span>{t.vol.toLocaleString()}</span>
