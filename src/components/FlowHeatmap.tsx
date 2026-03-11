@@ -71,11 +71,11 @@ export default function FlowHeatmap() {
     }
   }, [trades]);
 
-  const TICKER_W = 64;
+  const TICKER_W = 46;
   const LABEL_H = 16;
-  const ROOF_H = 22;
+  const ROOF_H = 16;
   const TOP = LABEL_H + ROOF_H;
-  const FOUND_H = 12;
+  const FOUND_H = 6;
   const WPAD = 10;
   const COLS = EXPIRIES.length;
   const ROWS = sortedTickers.length;
@@ -916,21 +916,21 @@ export default function FlowHeatmap() {
     }
 
     /* ═══ LABELS + LOGOS ═══ */
-    ctx.font = "18px 'VT323', monospace";
+    ctx.font = "14px 'VT323', monospace";
     ctx.fillStyle = C.dim;
     ctx.textAlign = "center";
     for (let c = 0; c < COLS; c++)
       ctx.fillText(EXPIRIES[c], bL + c * colW + colW / 2, LABEL_H - 2);
 
-    ctx.font = "20px 'VT323', monospace";
+    ctx.font = "16px 'VT323', monospace";
     ctx.textAlign = "center";
     for (let r = 0; r < ROWS; r++) {
       const rowCenter = bT + r * rowH + rowH / 2;
-      drawLogo(ctx, sortedTickers[r], Math.floor(TICKER_W / 2 - 8), rowCenter - 14, 2);
+      drawLogo(ctx, sortedTickers[r], Math.floor(TICKER_W / 2 - 6), rowCenter - 12, 1.5);
       ctx.fillStyle = C.text;
       ctx.shadowColor = C.accent;
       ctx.shadowBlur = 4;
-      ctx.fillText(sortedTickers[r], TICKER_W / 2, rowCenter + 12);
+      ctx.fillText(sortedTickers[r], TICKER_W / 2, rowCenter + 10);
       ctx.shadowBlur = 0;
     }
 

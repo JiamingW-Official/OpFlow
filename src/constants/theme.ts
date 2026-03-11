@@ -20,7 +20,7 @@ export const BASE: Record<string, number> = {
   QQQ: 468, AMD: 178, MSFT: 418, GOOGL: 175, TSM: 165,
 };
 
-export const EXPIRIES = ["03/21", "03/28", "04/04", "04/17", "05/16", "06/20"] as const;
+export const EXPIRIES = ["03/14", "03/21", "03/28", "04/04", "04/17", "05/16", "06/20"] as const;
 
 export const FONTS = {
   display: "'Press Start 2P', monospace",
