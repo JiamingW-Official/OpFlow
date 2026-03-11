@@ -131,21 +131,17 @@ export default function PremiumTimeline() {
       }
     }
 
-    // Legend — pixel squares with LED glow
-    ctx.fillStyle = C.call;
-    ctx.fillRect(W - 150, 6, 10, 10);
-    ctx.font = "22px 'VT323', monospace";
-    ctx.fillStyle = C.call;
-    ctx.textAlign = "left";
-    ctx.shadowColor = C.call;
-    ctx.shadowBlur = 6;
-    ctx.fillText("📈 Going UP", W - 150, 18);
-
+    // Legend — right-aligned with enough spacing
+    ctx.font = "18px 'VT323', monospace";
+    ctx.textAlign = "right";
     ctx.fillStyle = C.put;
     ctx.shadowColor = C.put;
-    ctx.fillRect(W - 60, 6, 10, 10);
-    ctx.fillStyle = C.put;
-    ctx.fillText("📉 DOWN", W - 46, 18);
+    ctx.shadowBlur = 6;
+    ctx.fillText("📉 Down", W - pad.r, 16);
+    const downW = ctx.measureText("📉 Down").width;
+    ctx.fillStyle = C.call;
+    ctx.shadowColor = C.call;
+    ctx.fillText("📈 Up", W - pad.r - downW - 12, 16);
     ctx.shadowBlur = 0;
   }, []);
 

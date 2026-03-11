@@ -785,12 +785,12 @@ export default function FlowHeatmap() {
       }
     }
 
-    /* ═══ DOOR — after windows for z-order ═══ */
+    /* ═══ DOOR — sits in foundation zone, not over bottom windows ═══ */
     if (ROWS > 0) {
       const doorW = Math.min(Math.floor(colW * 0.6), 24);
-      const doorH = Math.min(Math.floor(rowH * 0.9), 30);
+      const doorH = Math.min(FOUND_H + 4, 16);
       const doorX = Math.floor(bL + bW / 2 - doorW / 2);
-      const doorY = bB - doorH;
+      const doorY = bB - 2;
       ctx.fillStyle = "#3a3268";
       ctx.fillRect(doorX - 2, doorY - 3, doorW + 4, doorH + 3);
       ctx.fillStyle = "rgba(255,255,255,0.06)";
