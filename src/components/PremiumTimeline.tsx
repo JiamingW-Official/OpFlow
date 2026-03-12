@@ -156,8 +156,8 @@ export default function PremiumTimeline() {
   }, [drawChart]);
 
   return (
-    <PixelCard ref={containerRef} title="UP vs DOWN" titleIcon="⚡" style={{ position: "relative", overflow: "hidden" }}>
-      <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block" }} />
+    <PixelCard ref={containerRef} title="UP vs DOWN" titleIcon="⚡" style={{ display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+      <canvas ref={canvasRef} style={{ width: "100%", flex: 1, minHeight: 0, display: "block" }} />
     </PixelCard>
   );
 }

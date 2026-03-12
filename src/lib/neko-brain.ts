@@ -12,7 +12,7 @@ import { fmt } from "./format";
  * - Dynamic, personality-rich responses
  */
 
-interface TickerStats {
+export interface TickerStats {
   tk: string;
   total: number;
   count: number;
@@ -27,7 +27,7 @@ interface TickerStats {
   volatility: number;   // standard deviation of trade sizes
 }
 
-interface TradeStats {
+export interface TradeStats {
   topTickers: TickerStats[];
   totalPrem: number;
   callRatio: number;
@@ -45,7 +45,7 @@ interface TradeStats {
   sentimentShift: "improving" | "declining" | "stable";
 }
 
-function analyze(trades: Trade[]): TradeStats {
+export function analyze(trades: Trade[]): TradeStats {
   const recent = trades.slice(0, 40);
   const tickerMap = new Map<string, { trades: Trade[] }>();
 
