@@ -24,7 +24,7 @@ export default function TickerHeat() {
       const a = agg.get(tk)!;
       const total = a.callPrem + a.putPrem;
       return { tk, total, ratio: total > 0 ? a.callPrem / total : 0.5, count: a.count };
-    }).sort((a, b) => b.total - a.total);
+    }).sort((a, b) => b.total - a.total).slice(0, 7);
   }, [trades]);
 
   const maxTotal = Math.max(...data.map(d => d.total), 1);
@@ -48,18 +48,18 @@ export default function TickerHeat() {
           return (
             <div key={d.tk} className="ticker-row" style={{
               display: "flex", alignItems: "center", gap: 3,
-              padding: "3px 2px",
+              padding: "2px 2px",
               borderBottom: "1px solid rgba(102,204,255,0.04)",
               overflow: "hidden", minWidth: 0,
               background: i === 0 && d.total > 0 ? `linear-gradient(90deg, ${barColor}08, transparent)` : undefined,
               borderLeft: i < 3 && d.total > 0 ? `2px solid ${barColor}40` : "2px solid transparent",
             }}>
-              <span style={{ fontSize: 18, width: 22, textAlign: "center", flexShrink: 0 }}>
+              <span style={{ fontSize: 14, width: 20, textAlign: "center", flexShrink: 0 }}>
                 {i < 3 ? RANK_MEDALS[i] : <span style={{ fontFamily: FONTS.display, fontSize: 8, color: C.dim }}>#{i+1}</span>}
               </span>
 
               <span style={{
-                fontSize: 26, width: 52, flexShrink: 0,
+                fontSize: 18, width: 42, flexShrink: 0,
                 color: d.count > 0 ? C.bright : C.dim,
                 textShadow: d.count > 0 ? `0 0 6px ${C.bright}` : "none",
               }}>
@@ -114,14 +114,13 @@ export default function TickerHeat() {
                 ))}
               </div>
 
-              <span style={{ fontSize: 16, color: C.dim, flexShrink: 0, width: 70, textAlign: "right", overflow: "hidden", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 13, color: C.dim, flexShrink: 0, width: 60, textAlign: "right", overflow: "hidden", whiteSpace: "nowrap" }}>
                 {vibe}
               </span>
 
-              {/* Call ratio mini indicator */}
               {d.count > 0 && (
                 <span style={{
-                  fontSize: 16, flexShrink: 0, width: 28, textAlign: "right",
+                  fontSize: 13, flexShrink: 0, width: 26, textAlign: "right",
                   color: isUp ? C.call : C.put,
                   opacity: 0.6,
                 }}>
@@ -130,7 +129,7 @@ export default function TickerHeat() {
               )}
 
               <span style={{
-                fontSize: 22, flexShrink: 0, width: 52, textAlign: "right",
+                fontSize: 16, flexShrink: 0, width: 48, textAlign: "right",
                 color: d.total > 0 ? C.text : "transparent",
                 textShadow: d.total > 0 ? `0 0 4px ${barColor}` : "none",
                 overflow: "hidden", whiteSpace: "nowrap",

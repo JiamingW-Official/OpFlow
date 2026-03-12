@@ -99,7 +99,7 @@ export default function TapeFlow() {
           const label = f === "ALL" ? "ALL" : f === "CALL" ? "UP" : "DN";
           return (
             <button key={f} onClick={() => setType(f)} style={{
-              padding: "2px 4px", fontSize: 22,
+              padding: "2px 4px", fontSize: 16,
               border: `2px solid ${active ? color : "transparent"}`,
               background: active ? `${color}15` : "transparent",
               color: active ? color : C.dim,
@@ -110,7 +110,7 @@ export default function TapeFlow() {
         })}
         <div style={{ flex: 1 }} />
         <button onClick={() => setShowFilters(p => !p)} style={{
-          padding: "2px 4px", fontSize: 20,
+          padding: "2px 4px", fontSize: 16,
           border: `2px solid ${activeFilterCount > 0 ? C.accent : "transparent"}`,
           background: activeFilterCount > 0 ? "rgba(102,204,255,0.08)" : "transparent",
           color: activeFilterCount > 0 ? C.accent : C.dim,
@@ -160,7 +160,7 @@ export default function TapeFlow() {
             const relSize = t.total / maxPrem;
             return (
               <div key={t.id} className={`trade-row ${i === 0 ? "new-trade" : ""}`} style={{
-                padding: "5px 6px",
+                padding: "3px 6px",
                 background: dir
                   ? "linear-gradient(90deg, rgba(0,255,136,0.1) 0%, rgba(0,255,136,0.03) 100%)"
                   : "linear-gradient(90deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.03) 100%)",
@@ -187,7 +187,7 @@ export default function TapeFlow() {
                     letterSpacing: 1,
                   }}>{dir ? "▲UP" : "▼DN"}</span>
                   <span style={{
-                    fontSize: 30, color: C.bright,
+                    fontSize: 20, color: C.bright,
                     textShadow: `0 0 6px ${C.bright}`,
                     flexShrink: 0,
                   }}>{t.tk}</span>
@@ -198,13 +198,13 @@ export default function TapeFlow() {
                     }}>{size.text}</span>
                   )}
                   <span style={{
-                    marginLeft: "auto", color: dirColor, fontSize: 28,
+                    marginLeft: "auto", color: dirColor, fontSize: 18,
                     textShadow: `0 0 8px ${dirColor}`,
                     flexShrink: 0,
                     fontWeight: "bold",
                   }}>{fmt(t.total)}</span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 18, color: C.dim, marginTop: 1, overflow: "hidden", position: "relative" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 14, color: C.dim, marginTop: 1, overflow: "hidden", position: "relative" }}>
                   <span style={{ color: dirColor, opacity: 0.7 }}>{dir ? "📈" : "📉"}</span>
                   <span>${t.strike}</span>
                   <span>{t.exp}</span>
@@ -224,7 +224,7 @@ export default function TapeFlow() {
 function PxBtn({ children, active, onClick }: { children: string; active: boolean; onClick: () => void }) {
   return (
     <button onClick={onClick} style={{
-      padding: "1px 4px", fontSize: 18,
+      padding: "1px 4px", fontSize: 14,
       border: `2px solid ${active ? C.accent : "rgba(102,204,255,0.12)"}`,
       background: active ? "rgba(102,204,255,0.1)" : "transparent",
       color: active ? C.accent : C.dim,

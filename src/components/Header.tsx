@@ -76,7 +76,7 @@ export default function Header() {
     <PixelCard style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 12px", flexWrap: "wrap", overflow: "hidden" }}>
       {/* Mascot — click easter egg */}
       <span onClick={onCatClick} className="pixel-bounce" style={{
-        fontSize: 34, flexShrink: 0, position: "relative",
+        fontSize: 28, flexShrink: 0, position: "relative",
         transition: "transform 0.1s steps(2)",
         transform: catMsg ? "scale(1.3) rotate(-10deg)" : undefined,
       }}>
@@ -156,7 +156,7 @@ export default function Header() {
 
       {/* Mute toggle */}
       <button onClick={onToggleMute} style={{
-        padding: "4px 8px", fontSize: 24,
+        padding: "3px 6px", fontSize: 18,
         background: "transparent",
         border: `2px solid ${muted ? C.dim : C.accent}`,
         color: muted ? C.dim : C.accent,
@@ -168,7 +168,7 @@ export default function Header() {
       <ExportButton />
 
       <button onClick={handleShare} style={{
-        padding: "4px 8px", fontSize: 24,
+        padding: "3px 6px", fontSize: 18,
         background: "transparent",
         border: `2px solid ${C.pink}`,
         color: C.pink, cursor: "pointer",
@@ -187,11 +187,11 @@ export default function Header() {
 function Stat({ emoji, val, color, label, active }: { emoji: string; val: string; color: string; label?: string; active?: boolean }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
-      <span style={{ fontSize: 22 }}>{emoji}</span>
+      <span style={{ fontSize: 18 }}>{emoji}</span>
       <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
         {label && <span style={{ fontSize: 10, fontFamily: FONTS.display, color: C.dim, letterSpacing: 1 }}>{label}</span>}
         <span className={active ? "neon-pulse-active" : ""} style={{
-          fontSize: 30, color, lineHeight: 1,
+          fontSize: 22, color, lineHeight: 1,
           textShadow: `0 0 8px ${color}, 0 0 2px ${color}`,
         }}>{val}</span>
       </div>

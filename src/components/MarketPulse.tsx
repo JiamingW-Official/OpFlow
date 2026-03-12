@@ -52,11 +52,11 @@ export default function MarketPulse() {
 
   return (
     <PixelCard title="MARKET PULSE" titleIcon="📊" titleColor={C.accent}>
-      <div style={{ padding: "6px 8px", display: "flex", flexDirection: "column", gap: 5 }}>
+      <div style={{ padding: "4px 8px", display: "flex", flexDirection: "column", gap: 4 }}>
         {/* Pixel sentiment bar */}
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ fontSize: 16, flexShrink: 0 }}>🐂</span>
-          <div style={{ flex: 1, display: "flex", height: 12, gap: 1 }}>
+          <span style={{ fontSize: 14, flexShrink: 0 }}>🐂</span>
+          <div style={{ flex: 1, display: "flex", height: 10, gap: 1 }}>
             {Array.from({ length: barSegs }, (_, i) => (
               <div key={i} style={{
                 flex: 1,
@@ -67,18 +67,18 @@ export default function MarketPulse() {
               }} />
             ))}
           </div>
-          <span style={{ fontSize: 16, flexShrink: 0 }}>🐻</span>
+          <span style={{ fontSize: 14, flexShrink: 0 }}>🐻</span>
           <span style={{
-            fontSize: 22, fontFamily: FONTS.mono,
+            fontSize: 18, fontFamily: FONTS.mono,
             color: isBull ? C.call : C.put,
             textShadow: `0 0 6px ${isBull ? C.call : C.put}`,
-            minWidth: 56, textAlign: "right",
+            minWidth: 48, textAlign: "right",
           }}>{bullPct}%{isBull ? "↑" : "↓"}</span>
         </div>
 
         {/* Stats row */}
         <div style={{
-          display: "flex", gap: 4, fontSize: 18, color: C.dim,
+          display: "flex", gap: 4, fontSize: 15, color: C.dim,
           flexWrap: "wrap", alignItems: "center",
         }}>
           <span style={{ color: C.call, textShadow: `0 0 4px ${C.call}40` }}>▲{fmt(stats.callPrem)}</span>
@@ -94,10 +94,10 @@ export default function MarketPulse() {
 
         {/* Educational tip — rotates */}
         <div key={tipIdx} className="msg-in" style={{
-          padding: "4px 6px",
+          padding: "3px 6px",
           background: "rgba(102,204,255,0.04)",
           border: "1px solid rgba(102,204,255,0.08)",
-          fontSize: 18, color: C.dim,
+          fontSize: 15, color: C.dim,
           lineHeight: 1.3,
         }}>
           <div style={{

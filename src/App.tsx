@@ -6,7 +6,9 @@ import TapeFlow from "./components/TapeFlow";
 import FlowHeatmap from "./components/FlowHeatmap";
 import PremiumTimeline from "./components/PremiumTimeline";
 import AIAnalyst from "./components/AIAnalyst";
+import NekoNav from "./components/NekoNav";
 import TickerHeat from "./components/TickerHeat";
+import { NekoProvider } from "./context/NekoContext";
 import ToastAlert from "./components/ToastAlert";
 import MarketPulse from "./components/MarketPulse";
 import CursorTrail from "./components/ui/CursorTrail";
@@ -130,7 +132,18 @@ function FlowTerminal() {
           minHeight: 0,
           minWidth: 0,
         }}>
-          <TapeFlow />
+          {/* Left sidebar: LIVE BETS + NEKO NAV */}
+          <div style={{
+            display: "grid",
+            gridTemplateRows: "1.5fr 1fr",
+            gap: 8,
+            overflow: "hidden",
+            minHeight: 0,
+            minWidth: 0,
+          }}>
+            <TapeFlow />
+            <NekoNav />
+          </div>
 
           <div style={{
             display: "grid",
@@ -181,7 +194,9 @@ function FlowTerminal() {
 export default function App() {
   return (
     <FlowProvider>
-      <FlowTerminal />
+      <NekoProvider>
+        <FlowTerminal />
+      </NekoProvider>
     </FlowProvider>
   );
 }
