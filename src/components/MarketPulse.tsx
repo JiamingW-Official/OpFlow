@@ -57,15 +57,17 @@ export default function MarketPulse() {
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <span style={{ fontSize: 14, flexShrink: 0 }}>🐂</span>
           <div style={{ flex: 1, display: "flex", height: 10, gap: 1 }}>
-            {Array.from({ length: barSegs }, (_, i) => (
-              <div key={i} style={{
-                flex: 1,
-                background: i < bullSegs ? C.call : C.put,
-                opacity: i < bullSegs ? 0.85 : 0.65,
-                boxShadow: i === bullSegs - 1 || i === bullSegs
-                  ? `0 0 6px ${i < bullSegs ? C.call : C.put}` : undefined,
-              }} />
-            ))}
+            {Array.from({ length: barSegs }, (_, i) => {
+              const isEdge = i === bullSegs - 1 || i === bullSegs;
+              return (
+                <div key={i} className={isEdge ? "seg-edge" : ""} style={{
+                  flex: 1,
+                  background: i < bullSegs ? C.call : C.put,
+                  opacity: i < bullSegs ? 0.85 : 0.65,
+                  boxShadow: isEdge ? `0 0 8px ${i < bullSegs ? C.call : C.put}` : undefined,
+                }} />
+              );
+            })}
           </div>
           <span style={{ fontSize: 14, flexShrink: 0 }}>🐻</span>
           <span style={{

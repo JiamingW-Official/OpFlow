@@ -70,19 +70,19 @@ export default function ToastAlert() {
             const dir = toast.trade.type === "CALL";
             const dirColor = dir ? C.call : C.put;
             return (
-              <div key={toast.id} className={toast.removing ? "toast-out" : "toast-in"} style={{
+              <div key={toast.id} className={`${toast.removing ? "toast-out" : "toast-in"} whale-alert`} style={{
                 padding: "4px 8px",
-                background: "rgba(255,221,102,0.06)",
+                background: "linear-gradient(135deg, rgba(255,221,102,0.08), rgba(255,136,187,0.04))",
                 border: `2px solid ${C.gold}`,
-                boxShadow: `0 0 16px ${C.gold}50, 0 0 30px ${C.gold}20`,
                 fontFamily: FONTS.mono,
                 overflow: "hidden",
               }}>
                 <div style={{
                   fontFamily: FONTS.display, fontSize: 9, color: C.gold,
-                  textShadow: `0 0 8px ${C.gold}`, marginBottom: 2,
+                  marginBottom: 2,
                 }}>
-                  <span className="pixel-bounce" style={{ fontSize: 18, verticalAlign: "middle" }}>🐋</span> WHALE INCOMING!
+                  <span className="streak-fire" style={{ fontSize: 18, verticalAlign: "middle" }}>🐋</span>
+                  <span className="pixel-glow-pulse"> WHALE INCOMING!</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
                   <span style={{
@@ -100,8 +100,11 @@ export default function ToastAlert() {
                     textShadow: `0 0 10px ${C.gold}`,
                   }}>{fmt(toast.trade.total)}</span>
                 </div>
-                <div style={{ fontSize: 14, color: C.dim }}>
-                  🐋 BIG bet! ${toast.trade.strike}
+                <div style={{ fontSize: 14, color: C.dim, display: "flex", alignItems: "center", gap: 4 }}>
+                  <span>🐋 ${toast.trade.strike}</span>
+                  <span style={{ color: C.gold, fontFamily: FONTS.display, fontSize: 8 }}>MASSIVE</span>
+                  {toast.trade.isSweep && <span style={{ color: C.violet }}>⚡SWEEP</span>}
+                  {toast.trade.isBlock && <span style={{ color: C.gold }}>🧱BLOCK</span>}
                 </div>
               </div>
             );

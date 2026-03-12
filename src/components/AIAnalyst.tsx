@@ -54,6 +54,14 @@ export default function AIAnalyst() {
         minHeight: 0,
       }}>
         {msgs.map((m, i) => bubble(m.r, m.t, i))}
+        {/* Glow indicator on latest AI message */}
+        {msgs.length > 1 && msgs[msgs.length - 1].r === "ai" && !aiLoad && (
+          <div style={{
+            height: 2,
+            background: `linear-gradient(90deg, transparent, ${C.violet}40, transparent)`,
+            marginTop: -4,
+          }} />
+        )}
         {aiLoad && typingText && bubble("ai", typingText, "typing", true)}
         {aiLoad && !typingText && (
           <div className="msg-in" style={{
@@ -68,6 +76,19 @@ export default function AIAnalyst() {
             <span className="pixel-glow-pulse" style={{ fontSize: 17, color: C.violet, fontFamily: FONTS.mono }}>
               analyzing<span className="pixel-blink">...</span>
             </span>
+            <div style={{
+              marginTop: 4, height: 3, overflow: "hidden",
+              display: "flex", gap: 2,
+            }}>
+              {[0, 1, 2, 3, 4].map(j => (
+                <div key={j} className="pixel-sparkle" style={{
+                  flex: 1, height: 3,
+                  background: C.violet,
+                  opacity: 0.5,
+                  animationDelay: `${j * 0.2}s`,
+                }} />
+              ))}
+            </div>
           </div>
         )}
       </div>

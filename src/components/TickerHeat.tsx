@@ -46,22 +46,26 @@ export default function TickerHeat() {
           else vibe = "😊 ok";
 
           return (
-            <div key={d.tk} className="ticker-row" style={{
+            <div key={d.tk} className={`ticker-row ${i === 0 && d.total > 0 ? "ticker-row-top" : ""}`} style={{
               display: "flex", alignItems: "center", gap: 3,
               padding: "2px 2px",
               borderBottom: "1px solid rgba(102,204,255,0.04)",
               overflow: "hidden", minWidth: 0,
-              background: i === 0 && d.total > 0 ? `linear-gradient(90deg, ${barColor}08, transparent)` : undefined,
-              borderLeft: i < 3 && d.total > 0 ? `2px solid ${barColor}40` : "2px solid transparent",
+              background: i === 0 && d.total > 0
+                ? `linear-gradient(90deg, ${barColor}12, ${barColor}04, transparent)`
+                : i < 3 && d.total > 0
+                  ? `linear-gradient(90deg, ${barColor}06, transparent)`
+                  : undefined,
+              borderLeft: i < 3 && d.total > 0 ? `3px solid ${barColor}60` : "3px solid transparent",
             }}>
               <span style={{ fontSize: 14, width: 20, textAlign: "center", flexShrink: 0 }}>
                 {i < 3 ? RANK_MEDALS[i] : <span style={{ fontFamily: FONTS.display, fontSize: 8, color: C.dim }}>#{i+1}</span>}
               </span>
 
-              <span style={{
+              <span className={i === 0 && d.total > 0 ? "neon-pulse-active" : ""} style={{
                 fontSize: 18, width: 42, flexShrink: 0,
-                color: d.count > 0 ? C.bright : C.dim,
-                textShadow: d.count > 0 ? `0 0 6px ${C.bright}` : "none",
+                color: d.count > 0 ? (i === 0 ? barColor : C.bright) : C.dim,
+                textShadow: d.count > 0 ? `0 0 ${i === 0 ? 10 : 6}px ${i === 0 ? barColor : C.bright}` : "none",
               }}>
                 {d.tk}
               </span>

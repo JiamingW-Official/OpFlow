@@ -77,13 +77,12 @@ export default function TapeFlow() {
           display: "flex", alignItems: "center", gap: 4,
           fontFamily: FONTS.display, fontSize: 10,
         }}>
-          <span style={{ fontSize: 18 }}>{streak.type === "CALL" ? "🔥" : "❄️"}</span>
-          <span style={{ color: streak.type === "CALL" ? C.call : C.put, textShadow: `0 0 6px ${streak.type === "CALL" ? C.call : C.put}` }}>
+          <span className="streak-fire" style={{ fontSize: 18 }}>{streak.type === "CALL" ? "🔥" : "❄️"}</span>
+          <span className="streak-fire" style={{ color: streak.type === "CALL" ? C.call : C.put }}>
             {streak.count}x {streak.type === "CALL" ? "UP" : "DOWN"} STREAK!
           </span>
-          <span style={{ color: C.gold }}>
-            {streak.count >= 5 ? "COMBO!" : ""}
-          </span>
+          {streak.count >= 5 && <span className="pixel-glow-pulse" style={{ color: C.gold }}>COMBO!</span>}
+          {streak.count >= 8 && <span className="pixel-glow-pulse" style={{ color: C.pink }}>🔥UNSTOPPABLE</span>}
         </div>
       )}
 
@@ -159,11 +158,11 @@ export default function TapeFlow() {
             const size = sizeLabel(t.total);
             const relSize = t.total / maxPrem;
             return (
-              <div key={t.id} className={`trade-row ${i === 0 ? "new-trade" : ""}`} style={{
+              <div key={t.id} className={`trade-row ${i === 0 ? "new-trade" : ""} ${t.total >= 1e6 ? "trade-row-mega" : ""}`} style={{
                 padding: "3px 6px",
                 background: dir
-                  ? "linear-gradient(90deg, rgba(0,255,136,0.1) 0%, rgba(0,255,136,0.03) 100%)"
-                  : "linear-gradient(90deg, rgba(255,51,102,0.1) 0%, rgba(255,51,102,0.03) 100%)",
+                  ? `linear-gradient(90deg, rgba(0,255,136,${t.total >= 1e6 ? 0.15 : 0.08}) 0%, rgba(0,255,136,0.02) 100%)`
+                  : `linear-gradient(90deg, rgba(255,51,102,${t.total >= 1e6 ? 0.15 : 0.08}) 0%, rgba(255,51,102,0.02) 100%)`,
                 borderBottom: `1px solid ${dirColor}15`,
                 borderLeft: size.text ? `4px solid ${size.color}` : `4px solid ${dirColor}88`,
                 position: "relative", overflow: "hidden",
@@ -192,9 +191,12 @@ export default function TapeFlow() {
                     flexShrink: 0,
                   }}>{t.tk}</span>
                   {size.text && (
-                    <span className="pixel-glow-pulse" style={{
+                    <span className={t.total >= 5e6 ? "streak-fire" : "pixel-glow-pulse"} style={{
                       fontFamily: FONTS.display, fontSize: 10,
                       color: size.color, flexShrink: 0,
+                      background: t.total >= 5e6 ? `${size.color}15` : undefined,
+                      padding: t.total >= 5e6 ? "0 4px" : undefined,
+                      border: t.total >= 5e6 ? `1px solid ${size.color}40` : undefined,
                     }}>{size.text}</span>
                   )}
                   <span style={{

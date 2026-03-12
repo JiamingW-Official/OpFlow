@@ -104,20 +104,21 @@ export default function Header() {
           FLOW<span style={{ color: C.gold }}>✦</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 1 }}>
-          <span className="pixel-blink" style={{ color: statusColor, fontSize: 10 }}>●</span>
-          <span style={{ fontSize: 20, color: statusColor, textShadow: `0 0 6px ${statusColor}` }}>
+          <span className={connectionStatus === "connected" ? "live-heartbeat" : "pixel-blink"} style={{ color: statusColor, fontSize: 10, display: "inline-block" }}>●</span>
+          <span className={connectionStatus === "connected" ? "neon-pulse-active" : ""} style={{ fontSize: 20, color: statusColor, textShadow: `0 0 6px ${statusColor}` }}>
             {connectionStatus === "connected" ? "LIVE" : "..."}
           </span>
         </div>
       </div>
 
       {/* Power Level badge with fill bar */}
-      <div className="rainbow-border" style={{
+      <div className={power.level >= 3 ? "rainbow-border" : ""} style={{
         padding: "3px 8px",
         border: `2px solid ${power.color}`,
         background: `${power.color}10`,
         display: "flex", alignItems: "center", gap: 4, flexShrink: 0,
         position: "relative", overflow: "hidden",
+        boxShadow: power.level >= 4 ? `0 0 12px ${power.color}40, 0 0 4px ${power.color}20` : undefined,
       }}>
         <div style={{
           position: "absolute", left: 0, top: 0, bottom: 0,
@@ -155,7 +156,7 @@ export default function Header() {
       <div style={{ width: 2, height: 24, background: "rgba(102,204,255,0.1)", flexShrink: 0 }} />
 
       {/* Mute toggle */}
-      <button onClick={onToggleMute} style={{
+      <button onClick={onToggleMute} className="btn-glow" style={{
         padding: "3px 6px", fontSize: 18,
         background: "transparent",
         border: `2px solid ${muted ? C.dim : C.accent}`,
@@ -167,7 +168,7 @@ export default function Header() {
 
       <ExportButton />
 
-      <button onClick={handleShare} style={{
+      <button onClick={handleShare} className="btn-glow" style={{
         padding: "3px 6px", fontSize: 18,
         background: "transparent",
         border: `2px solid ${C.pink}`,
