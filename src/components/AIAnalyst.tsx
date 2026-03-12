@@ -13,14 +13,17 @@ export default function AIAnalyst() {
 
   const bubble = (role: "ai" | "user", text: string, key: number | string, typing = false) => {
     const isAI = role === "ai";
+    const isLatest = typeof key === "number" && key === msgs.length - 1 && isAI;
     return (
-      <div key={key} className="msg-in" style={{
+      <div key={key} className={`msg-in ${isLatest && !aiLoad ? "bubble-latest" : ""}`} style={{
         maxWidth: "94%",
         padding: "10px 14px",
         background: isAI
           ? "linear-gradient(135deg, rgba(204,136,255,0.10), rgba(255,136,187,0.06))"
-          : "rgba(102,204,255,0.08)",
+          : "linear-gradient(135deg, rgba(102,204,255,0.08), rgba(102,204,255,0.03))",
         border: `2px solid ${isAI ? "rgba(204,136,255,0.25)" : "rgba(102,204,255,0.18)"}`,
+        borderLeft: isAI ? "4px solid rgba(204,136,255,0.4)" : "2px solid rgba(102,204,255,0.18)",
+        borderRight: !isAI ? "4px solid rgba(102,204,255,0.3)" : "2px solid rgba(204,136,255,0.25)",
         alignSelf: isAI ? "flex-start" : "flex-end",
         wordBreak: "break-word" as const,
         whiteSpace: "pre-line" as const,

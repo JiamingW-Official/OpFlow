@@ -37,13 +37,13 @@ export default function TickerHeat() {
           const isUp = d.ratio >= 0.5;
           const barColor = isUp ? C.call : C.put;
 
-          let vibe: string;
-          if (d.count === 0) vibe = "😴 zzz";
-          else if (isUp && d.ratio > 0.7) vibe = "🚀 MOON";
-          else if (isUp && d.ratio > 0.55) vibe = "😆 hype";
-          else if (!isUp && d.ratio < 0.3) vibe = "😱 DUMP";
-          else if (!isUp) vibe = "😰 scary";
-          else vibe = "😊 ok";
+          let vibe: string, vibeColor: string, vibeClass = "";
+          if (d.count === 0) { vibe = "😴 zzz"; vibeColor = C.dim; }
+          else if (isUp && d.ratio > 0.7) { vibe = "🚀 MOON"; vibeColor = C.call; vibeClass = "vibe-hot"; }
+          else if (isUp && d.ratio > 0.55) { vibe = "😆 hype"; vibeColor = C.call; }
+          else if (!isUp && d.ratio < 0.3) { vibe = "😱 DUMP"; vibeColor = C.put; vibeClass = "vibe-hot"; }
+          else if (!isUp) { vibe = "😰 scary"; vibeColor = C.put; }
+          else { vibe = "😊 ok"; vibeColor = C.accent; }
 
           return (
             <div key={d.tk} className={`ticker-row ${i === 0 && d.total > 0 ? "ticker-row-top" : ""}`} style={{
@@ -118,7 +118,7 @@ export default function TickerHeat() {
                 ))}
               </div>
 
-              <span style={{ fontSize: 13, color: C.dim, flexShrink: 0, width: 60, textAlign: "right", overflow: "hidden", whiteSpace: "nowrap" }}>
+              <span className={vibeClass} style={{ fontSize: 13, color: vibeColor, flexShrink: 0, width: 60, textAlign: "right", overflow: "hidden", whiteSpace: "nowrap", textShadow: vibeColor !== C.dim ? `0 0 4px ${vibeColor}40` : "none" }}>
                 {vibe}
               </span>
 

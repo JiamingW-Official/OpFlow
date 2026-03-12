@@ -8,7 +8,7 @@ const PIXEL_CLIP = `polygon(
 )`;
 
 const CARD: CSSProperties = {
-  background: "#1a1a2e",
+  background: "linear-gradient(180deg, #1d1a30 0%, #1a1a2e 30%, #171528 100%)",
   border: "3px solid #66ccff",
   clipPath: PIXEL_CLIP,
   boxShadow: "0 0 18px rgba(102,204,255,0.12), inset 0 0 40px rgba(102,204,255,0.04)",
@@ -19,9 +19,8 @@ const CARD: CSSProperties = {
 
 const CORNER: CSSProperties = {
   position: "absolute",
-  width: 3,
-  height: 3,
-  background: "rgba(102,204,255,0.18)",
+  width: 4,
+  height: 4,
   pointerEvents: "none",
   zIndex: 2,
 };
@@ -31,11 +30,12 @@ const TITLE_BAR: CSSProperties = {
   alignItems: "center",
   gap: 6,
   padding: "7px 10px",
-  background: "linear-gradient(90deg, rgba(255,136,187,0.1), rgba(102,204,255,0.1), rgba(204,136,255,0.08))",
   borderBottom: "3px solid rgba(102,204,255,0.25)",
   fontFamily: "'Press Start 2P', monospace",
   fontSize: 12,
   letterSpacing: 1,
+  position: "relative",
+  overflow: "hidden",
 };
 
 interface PixelCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -46,27 +46,36 @@ interface PixelCardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(
-  ({ children, title, titleIcon, titleColor, style, ...props }, ref) => (
-    <div ref={ref} style={{ ...CARD, ...style }} {...props}>
-      {/* Corner pixel dots */}
-      <div style={{ ...CORNER, top: 8, left: 8 }} />
-      <div style={{ ...CORNER, top: 8, right: 8 }} />
-      <div style={{ ...CORNER, bottom: 8, left: 8 }} />
-      <div style={{ ...CORNER, bottom: 8, right: 8 }} />
-      {title && (
-        <div style={{ ...TITLE_BAR, color: titleColor || "#66ccff", textShadow: `0 0 8px ${titleColor || "#66ccff"}` }}>
-          {titleIcon && <span style={{ fontSize: 18 }}>{titleIcon}</span>}
-          <span className="glitch-text">{title}</span>
-          <span style={{ marginLeft: "auto", display: "flex", gap: 3, alignItems: "center" }}>
-            <span className="pixel-sparkle" style={{ fontSize: 13, color: "#ff88bb", animationDelay: "0s" }}>~</span>
-            <span className="pixel-sparkle" style={{ fontSize: 13, color: "#ffdd66", animationDelay: "0.4s" }}>*</span>
-            <span className="pixel-sparkle" style={{ fontSize: 13, color: "#66ccff", animationDelay: "0.8s" }}>~</span>
-          </span>
-        </div>
-      )}
-      {children}
-    </div>
-  ),
+  ({ children, title, titleIcon, titleColor, style, ...props }, ref) => {
+    const tc = titleColor || "#66ccff";
+    return (
+      <div ref={ref} className="pixel-card" style={{ ...CARD, ...style }} {...props}>
+        {/* Animated corner pixels */}
+        <div className="pixel-corner-glow" style={{ ...CORNER, top: 7, left: 7, background: tc, boxShadow: `0 0 6px ${tc}` }} />
+        <div className="pixel-corner-glow" style={{ ...CORNER, top: 7, right: 7, background: "#ff88bb", boxShadow: "0 0 6px #ff88bb", animationDelay: "0.5s" }} />
+        <div className="pixel-corner-glow" style={{ ...CORNER, bottom: 7, left: 7, background: "#ffdd66", boxShadow: "0 0 6px #ffdd66", animationDelay: "1s" }} />
+        <div className="pixel-corner-glow" style={{ ...CORNER, bottom: 7, right: 7, background: "#cc88ff", boxShadow: "0 0 6px #cc88ff", animationDelay: "1.5s" }} />
+        {title && (
+          <div className="pixel-card-title" style={{ ...TITLE_BAR, color: tc, textShadow: `0 0 8px ${tc}` }}>
+            {/* Animated gradient sweep */}
+            <div className="title-gradient-sweep" style={{
+              position: "absolute", inset: 0,
+              background: `linear-gradient(90deg, ${tc}08, ${tc}18, ${tc}08)`,
+              pointerEvents: "none",
+            }} />
+            {titleIcon && <span style={{ fontSize: 18, position: "relative" }}>{titleIcon}</span>}
+            <span className="glitch-text" style={{ position: "relative" }}>{title}</span>
+            <span style={{ marginLeft: "auto", display: "flex", gap: 4, alignItems: "center", position: "relative" }}>
+              <span className="pixel-sparkle" style={{ fontSize: 14, color: "#ff88bb", animationDelay: "0s" }}>~</span>
+              <span className="pixel-sparkle" style={{ fontSize: 14, color: "#ffdd66", animationDelay: "0.4s" }}>*</span>
+              <span className="pixel-sparkle" style={{ fontSize: 14, color: "#66ccff", animationDelay: "0.8s" }}>~</span>
+            </span>
+          </div>
+        )}
+        {children}
+      </div>
+    );
+  },
 );
 
 PixelCard.displayName = "PixelCard";

@@ -366,19 +366,7 @@ button:active {
   animation: neonPulseStrong 1s steps(3) infinite;
 }
 
-/* Pixel scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cc88ff;
-  border-radius: 0;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(102, 204, 255, 0.05);
-}
+/* (scrollbar styles consolidated below) */
 
 input::placeholder {
   color: #8888aa;
@@ -522,6 +510,120 @@ input::placeholder {
 
 .streak-fire {
   animation: streakFire 0.8s steps(3) infinite;
+}
+
+/* ═══ PIXEL CARD CORNER GLOW ═══ */
+@keyframes cornerGlow {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.4); }
+}
+
+.pixel-corner-glow {
+  animation: cornerGlow 2.5s steps(4) infinite;
+  border-radius: 0;
+}
+
+/* ═══ PIXEL CARD HOVER ═══ */
+.pixel-card {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.pixel-card:hover {
+  box-shadow: 0 0 24px rgba(102,204,255,0.18), inset 0 0 50px rgba(102,204,255,0.05);
+}
+
+/* ═══ TITLE GRADIENT SWEEP ═══ */
+@keyframes titleSweep {
+  0% { opacity: 0.6; background-position: -200% center; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; background-position: 200% center; }
+}
+
+.title-gradient-sweep {
+  background-size: 200% 100%;
+  animation: titleSweep 4s ease infinite;
+}
+
+/* ═══ VIBE TEXT COLOR PULSE ═══ */
+@keyframes vibeHot {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; text-shadow: 0 0 6px currentColor; }
+}
+
+.vibe-hot {
+  animation: vibeHot 2s steps(3) infinite;
+}
+
+/* ═══ SMOOTH SCROLLBAR ═══ */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #cc88ff, #ff88bb);
+  border-radius: 0;
+  box-shadow: 0 0 4px rgba(204,136,255,0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #dd99ff, #ff99cc);
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(102, 204, 255, 0.03);
+}
+
+/* ═══ POWER BADGE FLOAT ═══ */
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+
+.power-badge-float {
+  animation: badgeFloat 3s steps(4) infinite;
+}
+
+/* ═══ COUNTER TICK ═══ */
+@keyframes counterTick {
+  0% { transform: translateY(4px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.counter-tick {
+  animation: counterTick 0.15s steps(2) forwards;
+}
+
+/* ═══ LOADING SHIMMER OPTION ═══ */
+@keyframes optShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.neko-opt-loading {
+  background: linear-gradient(90deg, rgba(204,136,255,0.03) 30%, rgba(204,136,255,0.08) 50%, rgba(204,136,255,0.03) 70%) !important;
+  background-size: 200% 100%;
+  animation: optShimmer 1.5s linear infinite;
+  pointer-events: none;
+}
+
+/* ═══ TIP PROGRESS DOTS ═══ */
+.tip-dot {
+  transition: background 0.3s;
+}
+
+.tip-dot-active {
+  background: rgba(102,204,255,0.6) !important;
+  box-shadow: 0 0 4px rgba(102,204,255,0.4);
+}
+
+/* ═══ HOVER LIFT ═══ */
+.hover-lift {
+  transition: transform 0.1s steps(2), box-shadow 0.15s;
+}
+
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 /* Prevent ALL horizontal overflow */

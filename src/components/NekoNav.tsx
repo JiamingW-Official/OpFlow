@@ -104,7 +104,7 @@ export default function NekoNav() {
           .filter(o => comparePick ? o.label !== comparePick : true)
           .map(opt => (
             <button key={opt.id} onClick={() => handleOpt(opt)} disabled={aiLoad}
-              className="neko-opt"
+              className={`neko-opt ${aiLoad ? "neko-opt-loading" : ""}`}
               style={{
                 display: "flex", alignItems: "center", gap: 4,
                 padding: "5px 6px",

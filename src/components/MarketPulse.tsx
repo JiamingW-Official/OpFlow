@@ -83,15 +83,15 @@ export default function MarketPulse() {
           display: "flex", gap: 4, fontSize: 15, color: C.dim,
           flexWrap: "wrap", alignItems: "center",
         }}>
-          <span style={{ color: C.call, textShadow: `0 0 4px ${C.call}40` }}>▲{fmt(stats.callPrem)}</span>
-          <span style={{ opacity: 0.3 }}>│</span>
-          <span style={{ color: C.put, textShadow: `0 0 4px ${C.put}40` }}>▼{fmt(stats.putPrem)}</span>
+          <span className={stats.callPrem > stats.putPrem ? "neon-pulse-active" : ""} style={{ color: C.call, textShadow: `0 0 6px ${C.call}40` }}>▲{fmt(stats.callPrem)}</span>
+          <span style={{ opacity: 0.2 }}>│</span>
+          <span className={stats.putPrem > stats.callPrem ? "neon-pulse-active" : ""} style={{ color: C.put, textShadow: `0 0 6px ${C.put}40` }}>▼{fmt(stats.putPrem)}</span>
           {stats.topTicker && <>
-            <span style={{ opacity: 0.3 }}>│</span>
-            <span style={{ color: C.gold }}>👑{stats.topTicker}</span>
+            <span style={{ opacity: 0.2 }}>│</span>
+            <span style={{ color: C.gold, textShadow: `0 0 6px ${C.gold}40` }}>👑{stats.topTicker}</span>
           </>}
-          <span style={{ opacity: 0.3 }}>│</span>
-          <span style={{ color: C.accent }}>⚖️{stats.cpRatio.toFixed(1)}</span>
+          <span style={{ opacity: 0.2 }}>│</span>
+          <span style={{ color: stats.cpRatio >= 1 ? C.call : C.put, textShadow: `0 0 4px ${stats.cpRatio >= 1 ? C.call : C.put}40` }}>⚖️{stats.cpRatio.toFixed(1)}</span>
         </div>
 
         {/* Educational tip — rotates */}
@@ -108,6 +108,14 @@ export default function MarketPulse() {
             textShadow: `0 0 4px ${C.accent}`,
           }}>💡 DID YOU KNOW?</div>
           <div>{tip.icon} {tip.text}</div>
+          <div style={{ display: "flex", gap: 3, marginTop: 3, justifyContent: "center" }}>
+            {TIPS.map((_, j) => (
+              <div key={j} className={`tip-dot ${j === tipIdx ? "tip-dot-active" : ""}`} style={{
+                width: 4, height: 4,
+                background: j === tipIdx ? C.accent : "rgba(102,204,255,0.15)",
+              }} />
+            ))}
+          </div>
         </div>
       </div>
     </PixelCard>

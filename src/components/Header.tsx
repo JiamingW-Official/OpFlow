@@ -112,21 +112,23 @@ export default function Header() {
       </div>
 
       {/* Power Level badge with fill bar */}
-      <div className={power.level >= 3 ? "rainbow-border" : ""} style={{
-        padding: "3px 8px",
+      <div className={`${power.level >= 3 ? "rainbow-border" : ""} ${power.level >= 2 ? "power-badge-float" : ""}`} style={{
+        padding: "3px 10px",
         border: `2px solid ${power.color}`,
-        background: `${power.color}10`,
-        display: "flex", alignItems: "center", gap: 4, flexShrink: 0,
+        background: `linear-gradient(135deg, ${power.color}12, ${power.color}06)`,
+        display: "flex", alignItems: "center", gap: 5, flexShrink: 0,
         position: "relative", overflow: "hidden",
-        boxShadow: power.level >= 4 ? `0 0 12px ${power.color}40, 0 0 4px ${power.color}20` : undefined,
+        boxShadow: power.level >= 4
+          ? `0 0 16px ${power.color}50, 0 0 6px ${power.color}30, inset 0 0 20px ${power.color}10`
+          : power.level >= 2 ? `0 0 8px ${power.color}20` : undefined,
       }}>
         <div style={{
           position: "absolute", left: 0, top: 0, bottom: 0,
           width: `${Math.min((totalPrem / (power.level === 5 ? 50e6 : power.level === 4 ? 50e6 : power.level === 3 ? 20e6 : power.level === 2 ? 10e6 : 5e6)) * 100, 100)}%`,
-          background: `${power.color}15`,
+          background: `linear-gradient(90deg, ${power.color}20, ${power.color}08)`,
           transition: "width 0.5s steps(8)",
         }} />
-        <span style={{ fontSize: 20, position: "relative" }}>{power.emoji}</span>
+        <span className={power.level >= 3 ? "streak-fire" : ""} style={{ fontSize: 22, position: "relative" }}>{power.emoji}</span>
         <span style={{
           fontFamily: FONTS.display, fontSize: 10, color: power.color,
           textShadow: `0 0 8px ${power.color}`,
@@ -139,7 +141,7 @@ export default function Header() {
         fontFamily: FONTS.display, fontSize: 10, color: C.dim,
         flexShrink: 0, display: "flex", alignItems: "center", gap: 3,
       }}>
-        <span style={{ color: C.accent, textShadow: `0 0 4px ${C.accent}` }}>
+        <span key={trades.length} className="counter-tick" style={{ color: C.accent, textShadow: `0 0 6px ${C.accent}`, fontSize: 12 }}>
           {trades.length}
         </span>
         <span>BETS</span>

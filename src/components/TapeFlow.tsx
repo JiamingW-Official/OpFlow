@@ -67,7 +67,7 @@ export default function TapeFlow() {
   }, [streak.count, isCallStreak]);
 
   return (
-    <PixelCard title="LIVE BETS" titleIcon="🎰" style={{ display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0, minWidth: 0 }}>
+    <PixelCard title={`LIVE BETS${filtered.length > 0 ? ` [${filtered.length}]` : ""}`} titleIcon="🎰" style={{ display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0, minWidth: 0 }}>
       {/* Streak banner */}
       {streak.count >= 3 && (
         <div className="streak-glow" style={{
@@ -97,13 +97,14 @@ export default function TapeFlow() {
           const emoji = f === "ALL" ? "🌟" : f === "CALL" ? "📈" : "📉";
           const label = f === "ALL" ? "ALL" : f === "CALL" ? "UP" : "DN";
           return (
-            <button key={f} onClick={() => setType(f)} style={{
-              padding: "2px 4px", fontSize: 16,
-              border: `2px solid ${active ? color : "transparent"}`,
-              background: active ? `${color}15` : "transparent",
+            <button key={f} onClick={() => setType(f)} className="btn-glow" style={{
+              padding: "2px 6px", fontSize: 16,
+              border: `2px solid ${active ? color : "rgba(102,204,255,0.08)"}`,
+              background: active ? `${color}18` : "transparent",
               color: active ? color : C.dim,
               cursor: "pointer", fontFamily: FONTS.mono,
-              textShadow: active ? `0 0 6px ${color}` : "none",
+              textShadow: active ? `0 0 8px ${color}` : "none",
+              boxShadow: active ? `0 0 8px ${color}20, inset 0 0 12px ${color}08` : "none",
             }}>{emoji}{label}</button>
           );
         })}
