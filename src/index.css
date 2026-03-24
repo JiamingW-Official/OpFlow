@@ -537,24 +537,25 @@ input::placeholder {
 }
 
 /* ═══ PIXEL CARD HOVER ═══ */
+/* Note: clip-path clips box-shadow — use filter:drop-shadow which respects the polygon shape */
 .pixel-card {
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: filter 0.3s ease;
 }
 
 .pixel-card:hover {
-  box-shadow: 0 0 24px rgba(102,204,255,0.18), inset 0 0 50px rgba(102,204,255,0.05);
+  filter: drop-shadow(0 0 10px rgba(102,204,255,0.22));
 }
 
 /* ═══ TITLE GRADIENT SWEEP ═══ */
 @keyframes titleSweep {
-  0% { opacity: 0.6; background-position: -200% center; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; background-position: 200% center; }
+  0% { background-position: -200% center; opacity: 0.4; }
+  40% { opacity: 1; }
+  100% { background-position: 200% center; opacity: 0.4; }
 }
 
 .title-gradient-sweep {
-  background-size: 200% 100%;
-  animation: titleSweep 4s ease infinite;
+  /* background-size is set inline to avoid being reset by the background shorthand */
+  animation: titleSweep 4s linear infinite;
 }
 
 /* ═══ VIBE TEXT COLOR PULSE ═══ */
@@ -589,11 +590,11 @@ input::placeholder {
 /* ═══ POWER BADGE FLOAT ═══ */
 @keyframes badgeFloat {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-1px); }
+  50% { transform: translateY(-2px); }
 }
 
 .power-badge-float {
-  animation: badgeFloat 3s steps(4) infinite;
+  animation: badgeFloat 3s ease-in-out infinite;
 }
 
 /* ═══ COUNTER TICK ═══ */
@@ -621,7 +622,18 @@ input::placeholder {
 
 /* ═══ TIP PROGRESS DOTS ═══ */
 .tip-dot {
-  transition: background 0.3s;
+  transition: background 0.3s, transform 0.15s;
+}
+
+.tip-dot:focus-visible {
+  outline: 1px solid rgba(102,204,255,0.7);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.tip-dot:hover {
+  transform: scale(1.4);
+  background: rgba(102,204,255,0.4) !important;
 }
 
 .tip-dot-active {

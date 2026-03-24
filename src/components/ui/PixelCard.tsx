@@ -57,10 +57,11 @@ const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(
         <div aria-hidden="true" className="pixel-corner-glow" style={{ ...CORNER, bottom: 7, right: 7, background: "#cc88ff", boxShadow: "0 0 6px #cc88ff", animationDelay: "1.5s" }} />
         {title && (
           <div className="pixel-card-title" style={{ ...TITLE_BAR, color: tc, textShadow: `0 0 8px ${tc}` }}>
-            {/* Animated gradient sweep */}
+            {/* Animated gradient sweep — backgroundSize must be inline to not be reset by background shorthand */}
             <div className="title-gradient-sweep" style={{
               position: "absolute", inset: 0,
-              background: `linear-gradient(90deg, ${tc}08, ${tc}18, ${tc}08)`,
+              background: `linear-gradient(90deg, transparent 30%, ${tc}20 50%, transparent 70%)`,
+              backgroundSize: "200% 100%",
               pointerEvents: "none",
             }} />
             {titleIcon && <span style={{ fontSize: 18, position: "relative" }}>{titleIcon}</span>}

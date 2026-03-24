@@ -46,7 +46,9 @@ export default function TickerHeat() {
           else { vibe = "😊 ok"; vibeColor = C.accent; }
 
           return (
-            <div key={d.tk} className={`ticker-row ${i === 0 && d.total > 0 ? "ticker-row-top" : ""}`} style={{
+            <div key={d.tk}
+              aria-label={`#${i + 1} ${d.tk}: ${d.count} trades, ${Math.round(d.ratio * 100)}% calls, ${fmt(d.total)} total premium, sentiment ${vibe.replace(/\p{Emoji}/gu, "").trim()}`}
+              className={`ticker-row ${i === 0 && d.total > 0 ? "ticker-row-top" : ""}`} style={{
               display: "flex", alignItems: "center", gap: 3,
               padding: "2px 2px",
               borderBottom: "1px solid rgba(102,204,255,0.04)",

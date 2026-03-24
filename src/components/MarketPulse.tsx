@@ -54,8 +54,8 @@ export default function MarketPulse() {
     <PixelCard title="MARKET PULSE" titleIcon="📊" titleColor={C.accent}>
       <div style={{ padding: "4px 8px", display: "flex", flexDirection: "column", gap: 4 }}>
         {/* Pixel sentiment bar */}
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ fontSize: 14, flexShrink: 0 }}>🐂</span>
+        <div role="img" aria-label={`Market sentiment: ${bullPct}% bullish, ${100 - bullPct}% bearish`} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <span aria-hidden="true" style={{ fontSize: 14, flexShrink: 0 }}>🐂</span>
           <div style={{ flex: 1, display: "flex", height: 10, gap: 1 }}>
             {Array.from({ length: barSegs }, (_, i) => {
               const isEdge = i === bullSegs - 1 || i === bullSegs;
@@ -69,7 +69,7 @@ export default function MarketPulse() {
               );
             })}
           </div>
-          <span style={{ fontSize: 14, flexShrink: 0 }}>🐻</span>
+          <span aria-hidden="true" style={{ fontSize: 14, flexShrink: 0 }}>🐻</span>
           <span style={{
             fontSize: 18, fontFamily: FONTS.mono,
             color: isBull ? C.call : C.put,

@@ -75,7 +75,7 @@ export default function Header() {
   return (
     <PixelCard style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 12px", flexWrap: "wrap", overflow: "hidden" }}>
       {/* Mascot — click easter egg */}
-      <span onClick={onCatClick} role="button" aria-label="Pet Neko cat" tabIndex={0} className="pixel-bounce" style={{
+      <span onClick={onCatClick} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onCatClick(); } }} role="button" aria-label="Pet Neko cat" tabIndex={0} className="pixel-bounce" style={{
         fontSize: 28, flexShrink: 0, position: "relative",
         transition: "transform 0.1s steps(2)",
         transform: catMsg ? "scale(1.3) rotate(-10deg)" : undefined,
