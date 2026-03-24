@@ -30,7 +30,7 @@ function StatusBar() {
   }, []);
 
   return (
-    <div style={{
+    <div role="status" aria-label="Connection and trade count status" style={{
       position: "fixed", bottom: 0, left: 0, right: 0, height: 16,
       background: "linear-gradient(90deg, rgba(102,204,255,0.04), rgba(204,136,255,0.04), rgba(255,136,187,0.04))",
       borderTop: "1px solid rgba(102,204,255,0.08)",
@@ -54,12 +54,12 @@ const HUD_STYLE = { fontSize: 10, fontFamily: FONTS.display, color: "rgba(102,20
 
 const CornerHUD = memo(function CornerHUD() {
   return (
-    <>
+    <div aria-hidden="true">
       <div style={{ position: "fixed", top: 4, left: 4, ...HUD_STYLE }}>┌──</div>
       <div style={{ position: "fixed", top: 4, right: 4, ...HUD_STYLE }}>──┐</div>
       <div style={{ position: "fixed", bottom: 18, left: 4, ...HUD_STYLE }}>└──</div>
       <div style={{ position: "fixed", bottom: 18, right: 4, ...HUD_STYLE, textAlign: "right" }}>──┘</div>
-    </>
+    </div>
   );
 });
 
@@ -133,7 +133,7 @@ function FlowTerminal() {
           minWidth: 0,
         }}>
           {/* Left sidebar: LIVE BETS + NEKO NAV */}
-          <div style={{
+          <aside aria-label="Live bets and Neko assistant" style={{
             display: "grid",
             gridTemplateRows: "1.5fr 1fr",
             gap: 8,
@@ -143,9 +143,9 @@ function FlowTerminal() {
           }}>
             <TapeFlow />
             <NekoNav />
-          </div>
+          </aside>
 
-          <div style={{
+          <main aria-label="Money Tower and trade timeline" style={{
             display: "grid",
             gridTemplateRows: "1fr 110px",
             gap: 8,
@@ -155,9 +155,9 @@ function FlowTerminal() {
           }}>
             <FlowHeatmap />
             <PremiumTimeline />
-          </div>
+          </main>
 
-          <div style={{
+          <aside aria-label="Alerts, market sentiment, and AI analysis" style={{
             display: "grid",
             gridTemplateRows: "auto auto auto 1fr",
             gap: 8,
@@ -169,7 +169,7 @@ function FlowTerminal() {
             <MarketPulse />
             <TickerHeat />
             <AIAnalyst />
-          </div>
+          </aside>
         </div>
       </div>
 

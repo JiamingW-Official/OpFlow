@@ -43,6 +43,19 @@ button, [role="button"], a, input, select, textarea, label {
   cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='18'><path d='M5 0v7H3v2h2v1H3v2h2v1H3v2h10v-4h-2V8h-2V4H9V0Z' fill='%23ffdd66' stroke='%23080620' stroke-width='.7'/></svg>") 5 0, pointer !important;
 }
 
+/* ═══ KEYBOARD FOCUS INDICATOR ═══ */
+:focus-visible {
+  outline: 2px solid #66ccff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(102,204,255,0.2), 0 0 8px rgba(102,204,255,0.3);
+}
+
+button:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid #cc88ff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(204,136,255,0.2), 0 0 10px rgba(204,136,255,0.3);
+}
+
 /* ═══ BUTTON PRESS FEEDBACK ═══ */
 button:active {
   transform: scale(0.92) !important;

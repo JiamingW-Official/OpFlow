@@ -50,11 +50,11 @@ const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(
     const tc = titleColor || "#66ccff";
     return (
       <div ref={ref} className="pixel-card" style={{ ...CARD, ...style }} {...props}>
-        {/* Animated corner pixels */}
-        <div className="pixel-corner-glow" style={{ ...CORNER, top: 7, left: 7, background: tc, boxShadow: `0 0 6px ${tc}` }} />
-        <div className="pixel-corner-glow" style={{ ...CORNER, top: 7, right: 7, background: "#ff88bb", boxShadow: "0 0 6px #ff88bb", animationDelay: "0.5s" }} />
-        <div className="pixel-corner-glow" style={{ ...CORNER, bottom: 7, left: 7, background: "#ffdd66", boxShadow: "0 0 6px #ffdd66", animationDelay: "1s" }} />
-        <div className="pixel-corner-glow" style={{ ...CORNER, bottom: 7, right: 7, background: "#cc88ff", boxShadow: "0 0 6px #cc88ff", animationDelay: "1.5s" }} />
+        {/* Animated corner pixels — decorative */}
+        <div aria-hidden="true" className="pixel-corner-glow" style={{ ...CORNER, top: 7, left: 7, background: tc, boxShadow: `0 0 6px ${tc}` }} />
+        <div aria-hidden="true" className="pixel-corner-glow" style={{ ...CORNER, top: 7, right: 7, background: "#ff88bb", boxShadow: "0 0 6px #ff88bb", animationDelay: "0.5s" }} />
+        <div aria-hidden="true" className="pixel-corner-glow" style={{ ...CORNER, bottom: 7, left: 7, background: "#ffdd66", boxShadow: "0 0 6px #ffdd66", animationDelay: "1s" }} />
+        <div aria-hidden="true" className="pixel-corner-glow" style={{ ...CORNER, bottom: 7, right: 7, background: "#cc88ff", boxShadow: "0 0 6px #cc88ff", animationDelay: "1.5s" }} />
         {title && (
           <div className="pixel-card-title" style={{ ...TITLE_BAR, color: tc, textShadow: `0 0 8px ${tc}` }}>
             {/* Animated gradient sweep */}
@@ -65,7 +65,7 @@ const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(
             }} />
             {titleIcon && <span style={{ fontSize: 18, position: "relative" }}>{titleIcon}</span>}
             <span className="glitch-text" style={{ position: "relative" }}>{title}</span>
-            <span style={{ marginLeft: "auto", display: "flex", gap: 4, alignItems: "center", position: "relative" }}>
+            <span aria-hidden="true" style={{ marginLeft: "auto", display: "flex", gap: 4, alignItems: "center", position: "relative" }}>
               <span className="pixel-sparkle" style={{ fontSize: 14, color: "#ff88bb", animationDelay: "0s" }}>~</span>
               <span className="pixel-sparkle" style={{ fontSize: 14, color: "#ffdd66", animationDelay: "0.4s" }}>*</span>
               <span className="pixel-sparkle" style={{ fontSize: 14, color: "#66ccff", animationDelay: "0.8s" }}>~</span>

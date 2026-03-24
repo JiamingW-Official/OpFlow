@@ -79,19 +79,19 @@ export default function MarketPulse() {
         </div>
 
         {/* Stats row */}
-        <div style={{
+        <div role="group" aria-label="Market flow statistics" style={{
           display: "flex", gap: 4, fontSize: 15, color: C.dim,
           flexWrap: "wrap", alignItems: "center",
         }}>
-          <span className={stats.callPrem > stats.putPrem ? "neon-pulse-active" : ""} style={{ color: C.call, textShadow: `0 0 6px ${C.call}40` }}>▲{fmt(stats.callPrem)}</span>
-          <span style={{ opacity: 0.2 }}>│</span>
-          <span className={stats.putPrem > stats.callPrem ? "neon-pulse-active" : ""} style={{ color: C.put, textShadow: `0 0 6px ${C.put}40` }}>▼{fmt(stats.putPrem)}</span>
+          <span title="Total call premium" className={stats.callPrem > stats.putPrem ? "neon-pulse-active" : ""} style={{ color: C.call, textShadow: `0 0 6px ${C.call}40` }}>▲{fmt(stats.callPrem)}</span>
+          <span aria-hidden="true" style={{ opacity: 0.2 }}>│</span>
+          <span title="Total put premium" className={stats.putPrem > stats.callPrem ? "neon-pulse-active" : ""} style={{ color: C.put, textShadow: `0 0 6px ${C.put}40` }}>▼{fmt(stats.putPrem)}</span>
           {stats.topTicker && <>
-            <span style={{ opacity: 0.2 }}>│</span>
-            <span style={{ color: C.gold, textShadow: `0 0 6px ${C.gold}40` }}>👑{stats.topTicker}</span>
+            <span aria-hidden="true" style={{ opacity: 0.2 }}>│</span>
+            <span title="Most active ticker"  style={{ color: C.gold, textShadow: `0 0 6px ${C.gold}40` }}>👑{stats.topTicker}</span>
           </>}
-          <span style={{ opacity: 0.2 }}>│</span>
-          <span style={{ color: stats.cpRatio >= 1 ? C.call : C.put, textShadow: `0 0 4px ${stats.cpRatio >= 1 ? C.call : C.put}40` }}>⚖️{stats.cpRatio.toFixed(1)}</span>
+          <span aria-hidden="true" style={{ opacity: 0.2 }}>│</span>
+          <span title={`Call/Put ratio: ${stats.cpRatio >= 1 ? "bullish" : "bearish"}`} style={{ color: stats.cpRatio >= 1 ? C.call : C.put, textShadow: `0 0 4px ${stats.cpRatio >= 1 ? C.call : C.put}40` }}>⚖️{stats.cpRatio.toFixed(1)}</span>
         </div>
 
         {/* Educational tip — rotates */}
@@ -108,12 +108,15 @@ export default function MarketPulse() {
             textShadow: `0 0 4px ${C.accent}`,
           }}>💡 DID YOU KNOW?</div>
           <div>{tip.icon} {tip.text}</div>
-          <div style={{ display: "flex", gap: 3, marginTop: 3, justifyContent: "center" }}>
-            {TIPS.map((_, j) => (
-              <div key={j} className={`tip-dot ${j === tipIdx ? "tip-dot-active" : ""}`} style={{
-                width: 4, height: 4,
-                background: j === tipIdx ? C.accent : "rgba(102,204,255,0.15)",
-              }} />
+          <div role="tablist" aria-label="Navigate tips" style={{ display: "flex", gap: 4, marginTop: 4, justifyContent: "center" }}>
+            {TIPS.map((t, j) => (
+              <button key={j} role="tab" aria-label={`Tip ${j + 1}: ${t.text.slice(0, 40)}`} aria-selected={j === tipIdx}
+                onClick={() => setTipIdx(j)}
+                className={`tip-dot ${j === tipIdx ? "tip-dot-active" : ""}`} style={{
+                  width: 6, height: 6, padding: 0, border: "none",
+                  background: j === tipIdx ? C.accent : "rgba(102,204,255,0.15)",
+                  cursor: "pointer",
+                }} />
             ))}
           </div>
         </div>

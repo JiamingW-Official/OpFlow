@@ -75,7 +75,7 @@ export default function Header() {
   return (
     <PixelCard style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 12px", flexWrap: "wrap", overflow: "hidden" }}>
       {/* Mascot — click easter egg */}
-      <span onClick={onCatClick} className="pixel-bounce" style={{
+      <span onClick={onCatClick} role="button" aria-label="Pet Neko cat" tabIndex={0} className="pixel-bounce" style={{
         fontSize: 28, flexShrink: 0, position: "relative",
         transition: "transform 0.1s steps(2)",
         transform: catMsg ? "scale(1.3) rotate(-10deg)" : undefined,
@@ -158,7 +158,7 @@ export default function Header() {
       <div style={{ width: 2, height: 24, background: "rgba(102,204,255,0.1)", flexShrink: 0 }} />
 
       {/* Mute toggle */}
-      <button onClick={onToggleMute} className="btn-glow" style={{
+      <button onClick={onToggleMute} aria-label={muted ? "Unmute sounds" : "Mute sounds"} className="btn-glow" style={{
         padding: "3px 6px", fontSize: 18,
         background: "transparent",
         border: `2px solid ${muted ? C.dim : C.accent}`,
@@ -170,7 +170,7 @@ export default function Header() {
 
       <ExportButton />
 
-      <button onClick={handleShare} className="btn-glow" style={{
+      <button onClick={handleShare} aria-label="Share flow snapshot" className="btn-glow" style={{
         padding: "3px 6px", fontSize: 18,
         background: "transparent",
         border: `2px solid ${C.pink}`,

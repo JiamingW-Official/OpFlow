@@ -43,7 +43,7 @@ export default function NekoNav() {
         flexShrink: 0,
       }}>
         {mode === "follow-up" ? (
-          <button onClick={backToMenu} className="btn-glow" style={{
+          <button onClick={backToMenu} aria-label="Back to main menu" className="btn-glow" style={{
             flex: 1, fontSize: 11, fontFamily: FONTS.display,
             padding: "4px", background: "rgba(102,204,255,0.08)",
             border: `1px solid ${C.accent}`, color: C.accent,
@@ -56,6 +56,8 @@ export default function NekoNav() {
             const active = activeCat === cat.id;
             return (
               <button key={cat.id} onClick={() => handleCat(cat.id)}
+                aria-label={`${cat.label} analysis`}
+                aria-pressed={active}
                 className={active ? "cat-tab-active" : "btn-glow"}
                 style={{
                   flex: 1, padding: "4px 1px",
@@ -86,7 +88,7 @@ export default function NekoNav() {
           background: "rgba(255,221,102,0.04)",
         }}>
           ⚔️ {comparePick} vs ???
-          <button onClick={backToMenu} className="btn-glow" style={{
+          <button onClick={backToMenu} aria-label="Cancel compare" className="btn-glow" style={{
             marginLeft: 6, fontSize: 11, fontFamily: FONTS.display,
             padding: "1px 6px", background: "transparent",
             border: `1px solid ${C.dim}`, color: C.dim, cursor: "pointer",
@@ -104,6 +106,8 @@ export default function NekoNav() {
           .filter(o => comparePick ? o.label !== comparePick : true)
           .map(opt => (
             <button key={opt.id} onClick={() => handleOpt(opt)} disabled={aiLoad}
+              aria-label={`${opt.label}${opt.badge ? ` — ${opt.badge}` : ""}`}
+              aria-busy={aiLoad}
               className={`neko-opt ${aiLoad ? "neko-opt-loading" : ""}`}
               style={{
                 display: "flex", alignItems: "center", gap: 4,

@@ -97,25 +97,31 @@ export default function TapeFlow() {
           const emoji = f === "ALL" ? "🌟" : f === "CALL" ? "📈" : "📉";
           const label = f === "ALL" ? "ALL" : f === "CALL" ? "UP" : "DN";
           return (
-            <button key={f} onClick={() => setType(f)} className="btn-glow" style={{
-              padding: "2px 6px", fontSize: 16,
-              border: `2px solid ${active ? color : "rgba(102,204,255,0.08)"}`,
-              background: active ? `${color}18` : "transparent",
-              color: active ? color : C.dim,
-              cursor: "pointer", fontFamily: FONTS.mono,
-              textShadow: active ? `0 0 8px ${color}` : "none",
-              boxShadow: active ? `0 0 8px ${color}20, inset 0 0 12px ${color}08` : "none",
-            }}>{emoji}{label}</button>
+            <button key={f} onClick={() => setType(f)} className="btn-glow"
+              aria-label={`Show ${f === "ALL" ? "all trades" : f === "CALL" ? "calls (bullish bets)" : "puts (bearish bets)"}`}
+              aria-pressed={active}
+              style={{
+                padding: "2px 6px", fontSize: 16,
+                border: `2px solid ${active ? color : "rgba(102,204,255,0.08)"}`,
+                background: active ? `${color}18` : "transparent",
+                color: active ? color : C.dim,
+                cursor: "pointer", fontFamily: FONTS.mono,
+                textShadow: active ? `0 0 8px ${color}` : "none",
+                boxShadow: active ? `0 0 8px ${color}20, inset 0 0 12px ${color}08` : "none",
+              }}>{emoji}{label}</button>
           );
         })}
         <div style={{ flex: 1 }} />
-        <button onClick={() => setShowFilters(p => !p)} style={{
-          padding: "2px 4px", fontSize: 16,
-          border: `2px solid ${activeFilterCount > 0 ? C.accent : "transparent"}`,
-          background: activeFilterCount > 0 ? "rgba(102,204,255,0.08)" : "transparent",
-          color: activeFilterCount > 0 ? C.accent : C.dim,
-          cursor: "pointer", fontFamily: FONTS.mono,
-        }}>
+        <button onClick={() => setShowFilters(p => !p)}
+          aria-label={`${showFilters ? "Hide" : "Show"} filters${activeFilterCount > 0 ? ` (${activeFilterCount} active)` : ""}`}
+          aria-expanded={showFilters}
+          style={{
+            padding: "2px 4px", fontSize: 16,
+            border: `2px solid ${activeFilterCount > 0 ? C.accent : "transparent"}`,
+            background: activeFilterCount > 0 ? "rgba(102,204,255,0.08)" : "transparent",
+            color: activeFilterCount > 0 ? C.accent : C.dim,
+            cursor: "pointer", fontFamily: FONTS.mono,
+          }}>
           🔧{activeFilterCount > 0 ? activeFilterCount : ""}
         </button>
       </div>
@@ -148,8 +154,22 @@ export default function TapeFlow() {
         </div>
       )}
 
+      {/* Column header */}
+      <div aria-hidden="true" style={{
+        display: "flex", alignItems: "center", gap: 4,
+        padding: "1px 6px",
+        borderBottom: `1px solid rgba(102,204,255,0.06)`,
+        fontFamily: FONTS.display, fontSize: 7, color: C.dim,
+        letterSpacing: 0.5, flexShrink: 0,
+      }}>
+        <span style={{ width: 32, flexShrink: 0 }}>DIR</span>
+        <span style={{ width: 42, flexShrink: 0 }}>TICK</span>
+        <span style={{ flex: 1 }} />
+        <span style={{ width: 48, textAlign: "right", flexShrink: 0 }}>PREMIUM</span>
+      </div>
+
       {/* Trade list */}
-      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", minHeight: 0, minWidth: 0 }}>
+      <div role="list" aria-label="Live options flow trades" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", minHeight: 0, minWidth: 0 }}>
         {(() => {
           const shown = filtered.slice(0, 50);
           const maxPrem = shown.length > 0 ? Math.max(...shown.map(t => t.total)) : 1;
@@ -159,7 +179,9 @@ export default function TapeFlow() {
             const size = sizeLabel(t.total);
             const relSize = t.total / maxPrem;
             return (
-              <div key={t.id} className={`trade-row ${i === 0 ? "new-trade" : ""} ${t.total >= 1e6 ? "trade-row-mega" : ""}`} style={{
+              <div key={t.id} role="listitem"
+                aria-label={`${t.type === "CALL" ? "Call (bullish)" : "Put (bearish)"} ${t.tk} $${t.strike} exp ${t.exp} premium ${fmt(t.total)}`}
+                className={`trade-row ${i === 0 ? "new-trade" : ""} ${t.total >= 1e6 ? "trade-row-mega" : ""}`} style={{
                 padding: "3px 6px",
                 background: dir
                   ? `linear-gradient(90deg, rgba(0,255,136,${t.total >= 1e6 ? 0.15 : 0.08}) 0%, rgba(0,255,136,0.02) 100%)`
@@ -208,12 +230,12 @@ export default function TapeFlow() {
                   }}>{fmt(t.total)}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 14, color: C.dim, marginTop: 1, overflow: "hidden", position: "relative" }}>
-                  <span style={{ color: dirColor, opacity: 0.7 }}>{dir ? "📈" : "📉"}</span>
-                  <span>${t.strike}</span>
-                  <span>{t.exp}</span>
-                  <span>{t.vol.toLocaleString()}</span>
-                  {t.isBlock && <span style={{ color: C.gold }}>🐋</span>}
-                  {t.isSweep && <span style={{ color: C.violet }}>⚡</span>}
+                  <span aria-hidden="true" style={{ color: dirColor, opacity: 0.7 }}>{dir ? "📈" : "📉"}</span>
+                  <span title="Strike price">${t.strike}</span>
+                  <span title="Expiration date">{t.exp}</span>
+                  <span title="Volume (contracts traded)">{t.vol.toLocaleString()}</span>
+                  {t.isBlock && <span title="Block trade — large single institution order" style={{ color: C.gold }}>🐋</span>}
+                  {t.isSweep && <span title="Sweep — urgent buy across multiple exchanges" style={{ color: C.violet }}>⚡</span>}
                 </div>
               </div>
             );
